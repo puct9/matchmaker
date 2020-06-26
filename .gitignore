@@ -1,4 +1,5 @@
-/venv
+/.git
 /.vscode
-__pycache__
-/local_redis
+/static
+/venv
+/__pycache__
