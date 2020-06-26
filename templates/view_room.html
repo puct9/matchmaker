@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+    <header>
+        <title>Room {{ room_id }}</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">        
+    </header>
+    <body>
+        <div class="container">
+            <br />
+            <button class="btn btn-info" onclick="location.reload(); return false;">Refresh</button>
+            <br /><br />
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Player</th>
+                        <th scope="col">Response ID</th>
+                        <th scope="col">Responded</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for response_id, player in info['response_ids'].items() %}
+                        <tr>
+                            <th scope="row">{{ player }}</th>
+                            <td>{{ response_id }}</td>
+                            {% if not info['player_info'][player] %}
+                                <td>No</td>
+                            {% else %}
+                                <td>Yes</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br />
+            {% if all_ready %}
+                <button type="button" class="btn btn-success" onclick="RequestSuggestion()">Get teams</button>
+            {% endif %}
+            <div id="teams" hidden>
+                <br />
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-group">
+                            <li class="list-group-item active">Team 1</li>
+                            <li class="list-group-item" id="team1_1"></li>
+                            <li class="list-group-item" id="team1_2"></li>
+                            <li class="list-group-item" id="team1_3"></li>
+                            <li class="list-group-item" id="team1_4"></li>
+                            <li class="list-group-item" id="team1_5"></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-group">
+                            <li class="list-group-item active">Team 2</li>
+                            <li class="list-group-item" id="team2_1"></li>
+                            <li class="list-group-item" id="team2_2"></li>
+                            <li class="list-group-item" id="team2_3"></li>
+                            <li class="list-group-item" id="team2_4"></li>
+                            <li class="list-group-item" id="team2_5"></li>
+                        </ul>
+                    </div>
+                </div>
+                <br />
+            </div>
+        </div>
+        <script>
+            function RequestSuggestion() {
+                let xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        let res = JSON.parse(this.responseText);
+                        if (res.success !== true) {
+                            return;
+                        }
+                        for (let i = 0; i < 5; i++) {
+                            document.getElementById("team1_" + (i + 1)).innerHTML = res.team1[i];
+                            document.getElementById("team2_" + (i + 1)).innerHTML = res.team2[i];
+                        }
+                        document.getElementById("teams").hidden = false;
+                    }
+                }
+                xhttp.open("GET", "/api/suggest/{{ room_id }}", true);
+                xhttp.send();
+            }
+        </script>
+    </body>
+</html>
