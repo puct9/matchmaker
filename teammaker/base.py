@@ -3,6 +3,16 @@
 
 class Matcher:
 
+    NAME = ''
+
+    @staticmethod
+    def get_query():
+        pass
+
+    @staticmethod
+    def read_response():
+        pass
+
     def __init__(self):
         pass
 
