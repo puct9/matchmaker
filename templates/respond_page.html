@@ -7,13 +7,13 @@
     <body>
         <div class="container">
             <h1>Hi, {{ name }}</h1>
-            <h3>Put bigger numbers for people you like.</h3>
-            <p>Values will be normalised when they are processed. Positive integers only. Invalid inputs are counted as 0.</p>
+            <h3>{{ hint }}</h3>
+            <p>{{ extra }}</p>
             <form action="" method="POST">
-                {% for player in others %}
+                {% for _name, _prompt, _type in query %}
                     <div class="form-group">
-                        <label for="p{{ loop.index }}">{{ player }}</label>
-                        <input type="number" class="form-control" id="p{{ loop.index }}" name="p{{ loop.index }}">
+                        <label for="{{ _name }}">{{ _prompt }}</label>
+                        <input type="{{ _type }}" class="form-control" id="{{ _name }}" name="{{ _name }}">
                     </div>
                 {% endfor %}
                 <button class="btn btn-success btn-block" type="submit">Submit</button>

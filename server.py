@@ -1,26 +1,27 @@
 import json
+import os
 from base64 import b64decode
 
 from flask import Flask, Response, redirect, render_template, request, url_for
 
 from db import SimpleDB as LocalDB
-from teammaker import FriendMatcher
+from teammaker import FriendMatcher, str2matcher
 
 DB = LocalDB()
-APP = Flask(__name__)
+app = Flask(__name__)
 
 
-@APP.route('/')
+@app.route('/')
 def index():
     return render_template('index.html')
 
 
-@APP.route('/create')
+@app.route('/create')
 def create_prompt():
     return render_template('create_room.html')
 
 
-@APP.route('/create/<players_b64>')
+@app.route('/create/<players_b64>')
 def create_go(players_b64):
     players = b64decode(players_b64.encode()).decode().split(',')
     if len(set(players)) != 10:
@@ -29,7 +30,7 @@ def create_go(players_b64):
     return redirect(url_for('.room_view', room_id=room_id))
 
 
-@APP.route('/room/<room_id>')
+@app.route('/room/<room_id>')
 def room_view(room_id):
     info = DB.get_room_info(room_id)
     if info is None:
@@ -38,7 +39,7 @@ def room_view(room_id):
                            all_ready=all(info['player_info'].values()))
 
 
-@APP.route('/api/suggest/<room_id>')
+@app.route('/api/suggest/<room_id>')
 def api_room_suggest(room_id):
     info = DB.get_room_info(room_id)
     if info is None:
@@ -54,56 +55,46 @@ def api_room_suggest(room_id):
     prefs = []
     for player in info['players']:
         prefs.append(info['player_info'][player])
-    fm = FriendMatcher()
-    (t1, t2), _ = fm.generate_teams(prefs)
+    matcher = str2matcher(info['mode'])()
+    (t1, t2), _ = matcher.generate_teams(prefs)
     team1 = [info['players'][x] for x in t1]
     team2 = [info['players'][x] for x in t2]
     return Response(json.dumps({'success': True, 'team1': team1,
                                 'team2': team2}), mimetype='text/plain')
 
 
-@APP.route('/respond')
+@app.route('/respond')
 def respond_prompt():
     return render_template('respond_prompt.html',
                            error=request.args.get('error'))
 
 
-@APP.route('/respond/<response_id>')
+@app.route('/respond/<response_id>')
 def respond_page(response_id):
     if not DB.response_exists(response_id):
         return redirect(url_for('.respond_prompt', error='Bad response ID'))
-    room_id = DB.response_id_to_room(response_id)
-    us = DB.response_id_to_player(response_id)
-    them = DB.get_room_info(room_id)['players']
-    them.remove(us)
+    room_info = DB.get_room_info(DB.response_id_to_room(response_id))
+    hint, extra, query = str2matcher(room_info['mode']
+                                     ).get_query(room_info, response_id)
     return render_template('respond_page.html',
-                           name=us, others=them)
+                           name=room_info['response_ids'][response_id],
+                           hint=hint, extra=extra, query=query)
 
 
-@APP.route('/respond/<response_id>', methods=['POST'])
+@app.route('/respond/<response_id>', methods=['POST'])
 def respond_submit(response_id):
     if not DB.response_exists(response_id):
         return redirect(url_for('.respond_prompt', error='Bad response ID'))
-    _prefs = [request.form.get(f'p{i}') for i in range(1, 10)]
-    # normalalise
-    prefs = []
-    for pref in _prefs:
-        try:
-            prefs.append(max(0, int(pref)))
-        except ValueError:
-            prefs.append(0)
-    prefs_l1 = max(sum(prefs), 1e-3)  # avoid divide by zero
-    prefs = [x / prefs_l1 for x in prefs]
-    # insert ourselves as a 1 in the right spot
-    players = DB.get_room_info(DB.response_id_to_room(response_id))['players']
-    prefs.insert(players.index(DB.response_id_to_player(response_id)), 1)
+    room_info = DB.get_room_info(DB.response_id_to_room(response_id))
+    prefs = str2matcher(room_info['mode']).read_response(request.form)
+    print('prefs', prefs)
     DB.set_response(response_id, prefs)
     return redirect(url_for('.respond_prompt', error='Done!'))
 
 
 if __name__ == '__main__':
     try:
-        APP.run('0.0.0.0', 80, True)
+        app.run('0.0.0.0', 80, True)
     except PermissionError:
         _PORT = int(os.environ.get('PORT', 17995))
-        APP.run('0.0.0.0', _PORT, False)
+        app.run('0.0.0.0', _PORT, False)
