@@ -43,13 +43,13 @@ class SimpleDB(MMDB):
         self.rooms = {}
         self.reverse_mapping = {}
 
-    def create_room(self, players):
+    def create_room(self, players, mode='friend'):
         room_id = None
         # avoid collisions
         while room_id is None or room_id in self.rooms:
             room_id = ''.join(random.choices(CHARSET, k=6))
         self.rooms[room_id] = {
-            'mode': 'friend',
+            'mode': mode,
             'players': [p for p in players],
             'player_info': {p: None for p in players},
             'response_ids': {}

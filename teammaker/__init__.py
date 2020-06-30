@@ -1,7 +1,9 @@
 from .friendmatcher import FriendMatcher
+from .rolematcher import RoleMatcher
 
 MATCHERS = [
-    FriendMatcher
+    FriendMatcher,
+    RoleMatcher
 ]
 
 MAPPING = {
