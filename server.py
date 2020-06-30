@@ -21,11 +21,9 @@ def create_prompt():
     return render_template('create_room.html')
 
 
-@app.route('/create/<players_b64>')
-def create_go(players_b64):
-    players = b64decode(players_b64.encode()).decode().split(',')
-    if len(set(players)) != 10:
-        return redirect(url_for('.index'))
+@app.route('/create', methods=['POST'])
+def create_go():
+    players = [request.form.get(f'p{i}') for i in range(10)]
     room_id = DB.create_room(players)
     return redirect(url_for('.room_view', room_id=room_id))
 

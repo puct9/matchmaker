@@ -9,24 +9,24 @@
             <br />
             <a class="btn btn-large btn-danger" href="/">Back</a>
             <h1>Specify player names:</h1>
-            <div class="alert alert-danger" role="alert" id="error" hidden>Please make sure all fields are filled and there are no repeated names, and that the "," character is not included in any of the names.</div>
-            <button class="btn btn-block btn-info" id="create_button" onclick="Create()" hidden>Create</button>
+            <div class="alert alert-danger" role="alert" id="error" hidden>Please make sure all fields are filled and there are no repeated names.</div>
+            <form action="" method="POST" id="main_form">
+            </form>
+            <button class="btn btn-block btn-info" id="create_button" onclick="Create()">Create</button>
         </div>
         <script>
             window.onload = function() {
-                let cont = document.getElementById("main_container");
+                let group = document.getElementById("main_form");
                 for (let i = 1; i < 11; i++) {
                     let input_field = document.createElement("input");
                     input_field.setAttribute("placeholder", "Player " + i);
                     input_field.setAttribute("type", "text");
                     input_field.setAttribute("class", "form-control");
-                    input_field.setAttribute("id", "player" + i)
-                    cont.appendChild(input_field);
-                    cont.appendChild(document.createElement("br"));
+                    input_field.setAttribute("id", "player" + i);
+                    input_field.setAttribute("name", "p" + i);
+                    group.appendChild(input_field);
+                    group.appendChild(document.createElement("br"));
                 }
-                let create_btn = document.getElementById("create_button");
-                cont.appendChild(create_btn);
-                create_btn.hidden = false;
             }
 
             function Create() {
@@ -36,11 +36,11 @@
                     let name = document.getElementById("player" + i).value;
                     if (name == "" || names.includes(name) || name.includes(",")) {
                         document.getElementById("error").hidden = false;
-                        return;
+                        return false;
                     }
                     names.push(name);
                 }
-                window.location = "/create/" + btoa(names.join());
+                document.getElementById("main_form").submit();
             }
         </script>
     </body>
