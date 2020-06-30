@@ -6,11 +6,11 @@ class Matcher:
     NAME = ''
 
     @staticmethod
-    def get_query():
+    def get_query(room_info, response_id):
         pass
 
     @staticmethod
-    def read_response():
+    def read_response(response):
         pass
 
     def __init__(self):
