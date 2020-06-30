@@ -25,7 +25,13 @@ class RoleMatcher(Matcher):
     @staticmethod
     def read_response(response):
         roles = ['top', 'jg', 'mid', 'adc', 'sup']
-        return [min(max(response.get(role, 0), 0), 10) for role in roles]
+        values = []
+        for role in roles:
+            try:
+                values.append(min(max(int(response.get(role, 0)), 0), 10))
+            except (KeyError, ValueError):
+                values.append(0)
+        return values
 
     def __init__(self, epsilon=1e-5, strategy='fair'):
         super().__init__()
