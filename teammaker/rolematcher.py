@@ -61,7 +61,6 @@ class RoleMatcher(Matcher):
                 continue
             best_score = score
             best_teams = (suggest_t1, suggest_t2)
-        print(best_teams)
         return best_teams, best_happiness
 
     def team_transpose(self, t1, t2, move):
