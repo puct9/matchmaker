@@ -1,3 +1,5 @@
+import json
+import os
 import random
 import string
 from copy import deepcopy
@@ -8,6 +10,9 @@ CHARSET = string.ascii_uppercase + string.digits
 class MMDB:
 
     def __init__(self):
+        pass
+
+    def reset(self):
         pass
 
     def create_room(self, players):
@@ -42,6 +47,10 @@ class SimpleDB(MMDB):
         super().__init__()
         self.rooms = {}
         self.reverse_mapping = {}
+
+    def reset(self):
+        self.rooms.clear()
+        self.reverse_mapping.clear()
 
     def create_room(self, players, mode='friend'):
         room_id = None
@@ -87,3 +96,31 @@ class SimpleDB(MMDB):
         if self.response_exists(response_id):
             return self.rooms[self.reverse_mapping[response_id]
                               ]['response_ids'][response_id]
+
+
+class SimpleFsDB(SimpleDB):
+
+    def __init__(self, fname='dump.json'):
+        super().__init__()
+        self.fname = fname
+        if os.path.isfile(fname):
+            # load
+            self.rooms, self.reverse_mapping = json.load(open(fname))
+
+    def write_info(self):
+        json.dump([self.rooms, self.reverse_mapping], open(self.fname, 'w'),
+                  indent=4)
+
+    def reset(self):
+        super().reset()
+        self.write_info()
+
+    def create_room(self, players, mode='friend'):
+        ret = super().create_room(players, mode=mode)
+        self.write_info()
+        return ret
+
+    def set_response(self, response_id, prefs):
+        ret = super().set_response(response_id, prefs)
+        self.write_info()
+        return ret
