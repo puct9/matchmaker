@@ -10,6 +10,9 @@ class MMDB:
     def __init__(self):
         pass
 
+    def reset(self):
+        pass
+
     def create_room(self, players):
         # for now the mode is set only for player-player preferences
         # returns new room id
@@ -42,6 +45,10 @@ class SimpleDB(MMDB):
         super().__init__()
         self.rooms = {}
         self.reverse_mapping = {}
+
+    def reset(self):
+        self.rooms.clear()
+        self.reverse_mapping.clear()
 
     def create_room(self, players, mode='friend'):
         room_id = None
