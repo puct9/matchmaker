@@ -10,9 +10,20 @@
             <button class="btn btn-info" onclick="location.reload(); return false;">Refresh</button>
             <br /><br />
             <p>Share the response IDs with the respective person. They can fill in their response by going to the <a href="/">home</a> page and
-            pressing <a href="/respond">Respond</a> before entering their response ID.</p>
+            pressing <a href="/respond">Respond</a> before entering their response ID. Alternatively, you may opt to share this this
+            <a href="/room/{{ room_id }}/quickrespond">easy response page</a> or use the below button to copy all the names and response ids to
+            your clipboard which you may then paste into Discord or something.</p>
             <p>Manually refresh the page periodically using the refresh button or by clicking <a href="">here</a>. Once all responses have been
-            attended to, the option to generate teams will be revealed.</p>
+            completed, the option to generate teams will be revealed.</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <button class="btn btn-block btn-info" onclick="CopyTextToClipboard(cpinfo)">Copy information to clipboard</button>
+                </div>
+                <div class="col-md-6">
+                    <button class="btn btn-block btn-info" onclick="CopyTextToClipboard(cplink)">Copy easy response link to clipboard</button>
+                </div>
+            </div>
+            <br />
             <table class="table">
                 <thead>
                     <tr>
@@ -23,21 +34,21 @@
                 </thead>
                 <tbody>
                     {% for response_id, player in info['response_ids'].items() %}
-                        <tr>
-                            <th scope="row">{{ player }}</th>
-                            <td>{{ response_id }}</td>
-                            {% if not info['player_info'][player] %}
-                                <td>No</td>
-                            {% else %}
-                                <td>Yes</td>
-                            {% endif %}
-                        </tr>
+                    <tr>
+                        <th scope="row">{{ player }}</th>
+                        <td>{{ response_id }}</td>
+                        {% if not info['player_info'][player] %}
+                        <td>No</td>
+                        {% else %}
+                        <td>Yes</td>
+                        {% endif %}
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
             <br />
             {% if all_ready %}
-                <button type="button" class="btn btn-success" onclick="RequestSuggestion()">Get teams</button>
+            <button type="button" class="btn btn-success" onclick="RequestSuggestion()">Get teams</button>
             {% endif %}
             <div id="teams" hidden>
                 <br />
@@ -65,8 +76,21 @@
                 </div>
                 <br />
             </div>
+            <textarea id="copytext" class="form-control" hidden></textarea>
         </div>
         <script>
+            var cpinfo = "```\n{{ copy_info }}\n```";
+            var cplink = location.href + "/quickrespond";
+
+            function CopyTextToClipboard(t) {
+                let tmp = document.getElementById("copytext");
+                tmp.value = t;
+                tmp.hidden = false;
+                tmp.select();
+                document.execCommand("copy");
+                tmp.hidden = true;
+            }
+            
             function RequestSuggestion() {
                 let xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
