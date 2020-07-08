@@ -1,3 +1,5 @@
+import json
+import os
 import random
 import string
 from copy import deepcopy
@@ -94,3 +96,30 @@ class SimpleDB(MMDB):
         if self.response_exists(response_id):
             return self.rooms[self.reverse_mapping[response_id]
                               ]['response_ids'][response_id]
+
+
+class SimpleFsDB(SimpleDB):
+
+    def __init__(self, fname='dump.json'):
+        super().__init__()
+        self.fname = fname
+        if os.path.isfile(fname):
+            # load
+            self.rooms, self.reverse_mapping = json.load(open(fname))
+
+    def write_info(self):
+        json.dump([self.rooms, self.reverse_mapping], open(self.fname, 'w'))
+
+    def reset(self):
+        super().reset()
+        self.write_info()
+
+    def create_room(self, players, mode='friend'):
+        ret = super().create_room(players, mode=mode)
+        self.write_info()
+        return ret
+
+    def set_response(self, response_id, prefs):
+        ret = super().set_response(response_id, prefs)
+        self.write_info()
+        return ret
