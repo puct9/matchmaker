@@ -97,7 +97,9 @@ class RoleMatcher(Matcher):
                                               moves=moves)
         yield t1, t2, current_score
 
-    def fair_logsum_strategy(self, happiness_1, happiness_2, verbose=False):
+    def fair_logsum_strategy(self, happiness_1, happiness_2, print_fn=None,
+                             verbose=False):
+        print_fn = print_fn or (print if verbose else None)
         # adjust for team fairness
         t1_score = sum(log(max(h, self.epsilon)) for h in happiness_1)
         t2_score = sum(log(max(h, self.epsilon)) for h in happiness_2)
@@ -108,20 +110,21 @@ class RoleMatcher(Matcher):
         diff_penalty = sum((log(a + diff_softness) -
                             log(b + diff_softness)) ** 2 * 5
                            for a, b in zip(happiness_1, happiness_2))
-        if verbose:
+        if print_fn is not None:
             diffs = [(log(a + diff_softness) -
                       log(b + diff_softness)) ** 2 * 5
                      for a, b in zip(happiness_1, happiness_2)]
             positives = t1_score + t2_score + fairness_bonus
-            print(f'Evaluation metrics:\n=======\nBonuses\n=======\n'
-                  f'Team 1 happiness {happiness_1}\n'
-                  f'Team 2 happiness {happiness_2}\n'
-                  f'Team 1 score     {t1_score}\nTeam 2 score     {t2_score}\n'
-                  f'Fairness bonus   {fairness_bonus}\n'
-                  f'Calculation      {positives}\n\n'
-                  f'=========\nPenalties\n=========\n'
-                  f'Differences      {diffs}\n'
-                  f'Calculation      {diff_penalty}\n\n'
-                  f'=====\nScore\n=====\n{positives - diff_penalty}\n')
+            print_fn(f'Evaluation metrics:\n=======\nBonuses\n=======\n'
+                     f'Team 1 happiness {happiness_1}\n'
+                     f'Team 2 happiness {happiness_2}\n'
+                     f'Team 1 score     {t1_score}\n'
+                     f'Team 2 score     {t2_score}\n'
+                     f'Fairness bonus   {fairness_bonus}\n'
+                     f'Calculation      {positives}\n\n'
+                     f'=========\nPenalties\n=========\n'
+                     f'Differences      {diffs}\n'
+                     f'Calculation      {diff_penalty}\n\n'
+                     f'=====\nScore\n=====\n{positives - diff_penalty}\n')
         # + random.random() / 100
         return (t1_score + t2_score + fairness_bonus - diff_penalty)
