@@ -108,7 +108,8 @@ class SimpleFsDB(SimpleDB):
             self.rooms, self.reverse_mapping = json.load(open(fname))
 
     def write_info(self):
-        json.dump([self.rooms, self.reverse_mapping], open(self.fname, 'w'))
+        json.dump([self.rooms, self.reverse_mapping], open(self.fname, 'w'),
+                  indent=4)
 
     def reset(self):
         super().reset()
