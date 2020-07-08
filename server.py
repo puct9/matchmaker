@@ -74,11 +74,12 @@ def respond_page(response_id):
     if not DB.response_exists(response_id):
         return redirect(url_for('.respond_prompt', error='Bad response ID'))
     room_info = DB.get_room_info(DB.response_id_to_room(response_id))
-    hint, extra, query = str2matcher(room_info['mode']
-                                     ).get_query(room_info, response_id)
-    return render_template('respond_page.html',
+    hint, extra, query, template, bonus = str2matcher(room_info['mode']
+                                                      ).get_query(room_info,
+                                                                  response_id)
+    return render_template(template,
                            name=room_info['response_ids'][response_id],
-                           hint=hint, extra=extra, query=query)
+                           hint=hint, extra=extra, query=query, bonus=bonus)
 
 
 @app.route('/respond/<response_id>', methods=['POST'])

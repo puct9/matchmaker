@@ -21,7 +21,8 @@ class FriendMatcher(Matcher):
                 'Invalid inputs are counted as 0.',
                 [(str(n), player, 'number')
                  for n, player in enumerate(room_info['players'])
-                 if n != player_n])
+                 if n != player_n],
+                 'respond_page_default.html', None)
 
     @staticmethod
     def read_response(response):
