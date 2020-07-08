@@ -35,8 +35,20 @@ def room_view(room_id):
     info = DB.get_room_info(room_id)
     if info is None:
         return redirect(url_for('.index'))
+    maxlen = max(len(p) for p in info['player_info'])
+    fecpy = '\\n'.join(p + ' ' * (maxlen - len(p) + 2) + r
+                      for r, p in info['response_ids'].items())
     return render_template('view_room.html', info=info, room_id=room_id,
-                           all_ready=all(info['player_info'].values()))
+                           all_ready=all(info['player_info'].values()),
+                           copy_info=fecpy)
+
+
+@app.route('/room/<room_id>/quickrespond')
+def room_quickresponse(room_id):
+    info = DB.get_room_info(room_id)
+    if info is None:
+        return redirect(url_for('.index'))
+    return render_template('quickresponse.html', info=info, room_id=room_id)
 
 
 @app.route('/api/suggest/<room_id>')
