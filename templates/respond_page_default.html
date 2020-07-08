@@ -1,0 +1,12 @@
+{% extends "respond_page_base.html" %}
+{% block response_form %}
+<form action="" method="POST">
+    {% for _name, _prompt, _type in query %}
+    <div class="form-group">
+        <label for="{{ _name }}">{{ _prompt }}</label>
+        <input type="{{ _type }}" class="form-control" id="{{ _name }}" name="{{ _name }}">
+    </div>
+    {% endfor %}
+    <button class="btn btn-success btn-block" type="submit">Submit</button>
+</form>
+{% endblock %}

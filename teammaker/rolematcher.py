@@ -18,17 +18,18 @@ class RoleMatcher(Matcher):
     def get_query(room_info, response_id):
         other_players = room_info['players'].copy()
         other_players.remove(room_info['response_ids'][response_id])
-        tip = 'The other players are:\n' + ', '.join(other_players)
         return ('Roughly how many of the other players can you '
                 'beat at each role?',
-                'Answer as a value from 0 to 9. ' + tip,
+                'Answer as a value from 0 to 9. Other players are:',
                 [
                     ('top', 'Top lane', 'number'),
                     ('jg', 'Jungle', 'number'),
                     ('mid', 'Mid lane', 'number'),
                     ('adc', 'AD Carry', 'number'),
                     ('sup', 'Support', 'number')
-                ])
+                ],
+                'respond_page_rm1.html',
+                other_players)
 
     @staticmethod
     def read_response(response):
