@@ -16,9 +16,12 @@ class RoleMatcher(Matcher):
 
     @staticmethod
     def get_query(room_info, response_id):
-        return ('How confident are you in each role?',
-                'Answer as a value from 0 to 10. '
-                'Invalid or blank answers will default to 0.',
+        other_players = room_info['players'].copy()
+        other_players.remove(room_info['response_ids'][response_id])
+        tip = 'The other players are:\n' + ', '.join(other_players)
+        return ('Roughly how many of the other players can you '
+                'beat at each role?',
+                'Answer as a value from 0 to 9. ' + tip,
                 [
                     ('top', 'Top lane', 'number'),
                     ('jg', 'Jungle', 'number'),
@@ -33,7 +36,7 @@ class RoleMatcher(Matcher):
         values = []
         for role in roles:
             try:
-                values.append(min(max(int(response.get(role, 0)), 0), 10))
+                values.append(min(max(int(response.get(role, 0)), 0), 9))
             except (KeyError, ValueError):
                 values.append(0)
         return values
