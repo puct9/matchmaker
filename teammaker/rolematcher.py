@@ -1,8 +1,13 @@
 import random
 from itertools import combinations, permutations
-from math import log
+from math import log, exp
 
 from .base import Matcher
+
+
+# custom mathematical functions
+def sech2(x):
+    return 4 * exp(-2 * x) / (exp(-2 * x) + 1) ** 2
 
 
 class RoleMatcher(Matcher):
@@ -11,9 +16,12 @@ class RoleMatcher(Matcher):
 
     @staticmethod
     def get_query(room_info, response_id):
-        return ('How confident are you in each role?',
-                'Answer as a value from 0 to 10. '
-                'Invalid or blank answers will default to 0.',
+        other_players = room_info['players'].copy()
+        other_players.remove(room_info['response_ids'][response_id])
+        tip = 'The other players are:\n' + ', '.join(other_players)
+        return ('Roughly how many of the other players can you '
+                'beat at each role?',
+                'Answer as a value from 0 to 9. ' + tip,
                 [
                     ('top', 'Top lane', 'number'),
                     ('jg', 'Jungle', 'number'),
@@ -28,7 +36,7 @@ class RoleMatcher(Matcher):
         values = []
         for role in roles:
             try:
-                values.append(min(max(int(response.get(role, 0)), 0), 10))
+                values.append(min(max(int(response.get(role, 0)), 0), 9))
             except (KeyError, ValueError):
                 values.append(0)
         return values
@@ -42,7 +50,6 @@ class RoleMatcher(Matcher):
         strategy_fn = {
             'fair': self.fair_logsum_strategy
         }[self.strategy]
-        best_happiness = float('-inf')
         # we start with a random assortment of the two teams
         team1 = random.sample([i for i in range(10)], k=5)
         team2 = list({i for i in range(10)} - set(team1))
@@ -54,14 +61,14 @@ class RoleMatcher(Matcher):
         best_score = strategy_fn(happiness_1, happiness_2)
         best_teams = (team1, team2)
         suggestions = self.dfs_greedy_search(team1, team2,
-            best_score, strategy_fn, prefs, max_search=20
+            best_score, strategy_fn, prefs, max_search=50
         )
         for suggest_t1, suggest_t2, score in suggestions:
             if score <= best_score:
                 continue
             best_score = score
             best_teams = (suggest_t1, suggest_t2)
-        return best_teams, best_happiness
+        return best_teams, best_score
 
     def team_transpose(self, t1, t2, move):
         t_new = t1 + t2
@@ -93,16 +100,34 @@ class RoleMatcher(Matcher):
                                               moves=moves)
         yield t1, t2, current_score
 
-    def fair_logsum_strategy(self, happiness_1, happiness_2):
+    def fair_logsum_strategy(self, happiness_1, happiness_2, print_fn=None,
+                             verbose=False):
+        print_fn = print_fn or (print if verbose else None)
         # adjust for team fairness
         t1_score = sum(log(max(h, self.epsilon)) for h in happiness_1)
         t2_score = sum(log(max(h, self.epsilon)) for h in happiness_2)
-        # lowest possible score now is log(epsilon) * 5
-        t1_score += -log(self.epsilon) * 5 + self.epsilon
-        t2_score += -log(self.epsilon) * 5 + self.epsilon
+        fairness_bonus = sech2(t1_score - t2_score) * 5
         # adjust for role fairness
         # system is penalised for making a difference in mirroring roles
-        diff_penalty = sum(abs(log(a + 1) - log(b + 1))
-                           for a, b in zip(happiness_1, happiness_2)) / 50
-        return (log(t1_score) + log(t2_score) - diff_penalty +
-                random.random() / 100)
+        diff_softness = 2
+        diff_penalty = sum((log(a + diff_softness) -
+                            log(b + diff_softness)) ** 2 * 5
+                           for a, b in zip(happiness_1, happiness_2))
+        if print_fn is not None:
+            diffs = [(log(a + diff_softness) -
+                      log(b + diff_softness)) ** 2 * 5
+                     for a, b in zip(happiness_1, happiness_2)]
+            positives = t1_score + t2_score + fairness_bonus
+            print_fn(f'Evaluation metrics:\n=======\nBonuses\n=======\n'
+                     f'Team 1 happiness {happiness_1}\n'
+                     f'Team 2 happiness {happiness_2}\n'
+                     f'Team 1 score     {t1_score}\n'
+                     f'Team 2 score     {t2_score}\n'
+                     f'Fairness bonus   {fairness_bonus}\n'
+                     f'Calculation      {positives}\n\n'
+                     f'=========\nPenalties\n=========\n'
+                     f'Differences      {diffs}\n'
+                     f'Calculation      {diff_penalty}\n\n'
+                     f'=====\nScore\n=====\n{positives - diff_penalty}\n')
+        # + random.random() / 100
+        return (t1_score + t2_score + fairness_bonus - diff_penalty)
