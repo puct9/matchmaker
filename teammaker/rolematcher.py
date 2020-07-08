@@ -65,11 +65,6 @@ class RoleMatcher(Matcher):
                 continue
             best_score = score
             best_teams = (suggest_t1, suggest_t2)
-        strategy_fn(
-            [prefs[p][i] for i, p in enumerate(best_teams[0])],
-            [prefs[p][i] for i, p in enumerate(best_teams[1])],
-            True
-        )
         return best_teams, best_score
 
     def team_transpose(self, t1, t2, move):
