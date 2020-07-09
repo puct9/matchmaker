@@ -68,11 +68,12 @@ def api_room_suggest(room_id):
     for player in info['players']:
         prefs.append(info['player_info'][player])
     matcher = str2matcher(info['mode'])()
-    (t1, t2), _ = matcher.generate_teams(prefs)
+    (t1, t2), bonus_info = matcher.generate_teams(prefs)
     team1 = [info['players'][x] for x in t1]
     team2 = [info['players'][x] for x in t2]
     return Response(json.dumps({'success': True, 'team1': team1,
-                                'team2': team2}), mimetype='text/plain')
+                                'team2': team2, 'facts': bonus_info}),
+                               mimetype='text/plain')
 
 
 @app.route('/respond')
