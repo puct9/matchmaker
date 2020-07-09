@@ -69,7 +69,14 @@ class RoleMatcher(Matcher):
                 continue
             best_score = score
             best_teams = (suggest_t1, suggest_t2)
-        return best_teams, best_score
+        bonus_info = []
+        strategy_fn(
+            [prefs[p][i] for i, p in enumerate(best_teams[0])],
+            [prefs[p][i] for i, p in enumerate(best_teams[0])],
+            print_fn=bonus_info.append,
+            verbose=True
+        )
+        return best_teams, bonus_info[0]
 
     def team_transpose(self, t1, t2, move):
         t_new = t1 + t2
@@ -120,12 +127,12 @@ class RoleMatcher(Matcher):
                      for a, b in zip(happiness_1, happiness_2)]
             positives = t1_score + t2_score + fairness_bonus
             print_fn(f'Evaluation metrics:\n=======\nBonuses\n=======\n'
-                     f'Team 1 happiness {happiness_1}\n'
-                     f'Team 2 happiness {happiness_2}\n'
-                     f'Team 1 score     {t1_score}\n'
-                     f'Team 2 score     {t2_score}\n'
-                     f'Fairness bonus   {fairness_bonus}\n'
-                     f'Calculation      {positives}\n\n'
+                     f'Team 1 happiness  {happiness_1}\n'
+                     f'Team 2 happiness  {happiness_2}\n'
+                     f'Team 1 score        {t1_score}\n'
+                     f'Team 2 score        {t2_score}\n'
+                     f'Fairness bonus    + {fairness_bonus}\n'
+                     f'Calculation       = {positives}\n\n'
                      f'=========\nPenalties\n=========\n'
                      f'Differences      {diffs}\n'
                      f'Calculation      {diff_penalty}\n\n'
