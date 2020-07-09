@@ -49,9 +49,9 @@
             <br />
             {% if all_ready %}
             <button type="button" class="btn btn-success" onclick="RequestSuggestion()">Get teams</button>
+            <br /><br />
             {% endif %}
             <div id="teams" hidden>
-                <br />
                 <div class="row">
                     <div class="col-md-6">
                         <ul class="list-group">
@@ -76,6 +76,13 @@
                 </div>
                 <br />
             </div>
+            <div id="nerdsection" hidden>
+                <h3>Stats for nerds</h3>
+                <pre><code id="nerdinfo">Yes yes yes
+                    yes
+                </code></pre>
+            </div>
+            <br />
             <textarea id="copytext" class="form-control" hidden></textarea>
         </div>
         <script>
@@ -104,6 +111,9 @@
                             document.getElementById("team2_" + (i + 1)).innerHTML = res.team2[i];
                         }
                         document.getElementById("teams").hidden = false;
+                        // write nerd info as well
+                        document.getElementById("nerdinfo").innerHTML = res.facts;
+                        document.getElementById("nerdsection").hidden = false;
                     }
                 }
                 xhttp.open("GET", "/api/suggest/{{ room_id }}", true);
