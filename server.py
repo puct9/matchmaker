@@ -4,7 +4,7 @@ from base64 import b64decode
 
 from flask import Flask, Response, redirect, render_template, request, url_for
 
-from db import SimpleDB as LocalDB
+from db import SimpleFsDB as LocalDB
 from teammaker import FriendMatcher, str2matcher
 
 DB = LocalDB()
@@ -68,11 +68,12 @@ def api_room_suggest(room_id):
     for player in info['players']:
         prefs.append(info['player_info'][player])
     matcher = str2matcher(info['mode'])()
-    (t1, t2), _ = matcher.generate_teams(prefs)
+    (t1, t2), bonus_info = matcher.generate_teams(prefs)
     team1 = [info['players'][x] for x in t1]
     team2 = [info['players'][x] for x in t2]
     return Response(json.dumps({'success': True, 'team1': team1,
-                                'team2': team2}), mimetype='text/plain')
+                                'team2': team2, 'facts': bonus_info}),
+                               mimetype='text/plain')
 
 
 @app.route('/respond')
@@ -100,7 +101,6 @@ def respond_submit(response_id):
         return redirect(url_for('.respond_prompt', error='Bad response ID'))
     room_info = DB.get_room_info(DB.response_id_to_room(response_id))
     prefs = str2matcher(room_info['mode']).read_response(request.form)
-    print('prefs', prefs)
     DB.set_response(response_id, prefs)
     return redirect(url_for('.respond_prompt', error='Done!'))
 

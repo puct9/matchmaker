@@ -64,7 +64,7 @@ class FriendMatcher(Matcher):
                 optimal_team = (list(players_t1), players_t2)
         random.shuffle(optimal_team[0])
         random.shuffle(optimal_team[1])
-        return optimal_team, best_happiness
+        return optimal_team, f'Best happiness: {best_happiness}'
 
     def fair_strategy(self, happiness_1, happiness_2):
         return (log(max(happiness_1, self.epsilon)) +
