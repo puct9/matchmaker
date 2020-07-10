@@ -12,6 +12,8 @@
         <input type="{{ _type }}" class="form-control" id="{{ _name }}" name="{{ _name }}" min="0" max="9">
     </div>
     {% endfor %}
+    {% block respond_page_rm2_ext %}
+    {% endblock %}
     <button class="btn btn-success btn-block" type="submit">Submit</button>
 </form>
 {% endblock %}
