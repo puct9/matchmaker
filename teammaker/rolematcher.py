@@ -147,7 +147,8 @@ class RoleMatcherV2(RoleMatcher):
 
     @staticmethod
     def get_query(room_info, response_id):
-        ret = super(RoleMatcherV2, RoleMatcherV2).get_query(room_info, response_id)
+        ret = super(RoleMatcherV2, RoleMatcherV2).get_query(room_info,
+                                                            response_id)
         ret = list(ret)
         ret[3] = 'respond_page_rm2.html'
         return tuple(ret)
