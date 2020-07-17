@@ -19,7 +19,8 @@ class RoleMatcher(Matcher):
         other_players = room_info['players'].copy()
         other_players.remove(room_info['response_ids'][response_id])
         return ('Roughly how many of the other players can you '
-                'beat at each role?',
+                'beat at each role? Assume that your best 3 champions for '
+                'each role are banned.',
                 'Answer as a value from 0 to 9. Other players are:',
                 [
                     ('top', 'Top lane', 'number'),
@@ -197,7 +198,7 @@ class RoleMatcherV2(RoleMatcher):
                                  ratings_1, ratings_2)
         best_teams = (team1, team2)
         suggestions = self.dfs_greedy_search(team1, team2,
-            best_score, strategy_fn, prefs, max_search=50
+            best_score, strategy_fn, prefs, max_search=10
         )
         for suggest_t1, suggest_t2, score in suggestions:
             if score <= best_score:
@@ -251,35 +252,35 @@ class RoleMatcherV2(RoleMatcher):
                        for h in happiness_1) / 3
         t2_score = sum(log((h + self.epsilon) ** 2) + h ** 0.75
                        for h in happiness_2) / 3
-        fairness_bonus = sech2(t1_score - t2_score) * 2
+        fairness_bonus = sech2(t1_score - t2_score) * 3
         # adjust for team fairness based on peer rated strength
         t1_rating = sum(ratings_1)
         t2_rating = sum(ratings_2)
-        rating_fairness = sech2((t1_rating - t2_rating) / 2) ** 0.5 * 5
+        rating_fairness = sech2((t1_rating - t2_rating) / 3) ** 0.5 * 4
         # adjust for role fairness
         # system is penalised for making a difference in mirroring roles
         diff_softness = 2
         diff_penalty = sum((log(a + diff_softness) -
                             log(b + diff_softness)) ** 2 * 5 +
-                            0.1 * (c - d) ** 2
+                            0.04 * (c - d) ** 2
                            for a, b, c, d in zip(happiness_1, happiness_2,
                                                  ratings_1, ratings_2))
         if print_fn is not None:
             diffs = [(log(a + diff_softness) -
                       log(b + diff_softness)) ** 2 * 5 +
-                      0.1 * (c - d) ** 2
+                      0.04 * (c - d) ** 2
                      for a, b, c, d in zip(happiness_1, happiness_2,
                                            ratings_1, ratings_2)]
             positives = t1_score + t2_score + fairness_bonus + rating_fairness
             print_fn(f'Evaluation metrics:\n=======\nBonuses\n=======\n'
-                     f'Team 1 happiness  {happiness_1} -> '
+                     f'Team 1 skill      {happiness_1} -> '
                      f'{round(t1_score, 2)}\n'
-                     f'Team 2 happiness  {happiness_2} -> '
+                     f'Team 2 skill      {happiness_2} -> '
                      f'{round(t2_score, 2)}\n'
                      f'Team 1 ratings    {ratings_1} -> {sum(ratings_1)}\n'
                      f'Team 2 ratings    {ratings_2} -> {sum(ratings_2)}\n'
-                     f'Fairness bonus      {round(fairness_bonus, 2)}  (/2)\n'
-                     f'Rating fairness   + {round(rating_fairness, 2)}  (/5)\n'
+                     f'Fairness bonus      {round(fairness_bonus, 2)}  (/3)\n'
+                     f'Rating fairness   + {round(rating_fairness, 2)}  (/4)\n'
                      f'Calculation       = {round(positives, 2)}\n\n'
                      f'=========\nPenalties\n=========\n'
                      f'Differences      {[round(d, 2) for d in diffs]}\n'
