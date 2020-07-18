@@ -10,6 +10,10 @@ def sech2(x):
     return 4 * exp(-2 * x) / (exp(-2 * x) + 1) ** 2
 
 
+def sign(x):
+    return -1 if x < 0 else 1
+
+
 class RoleMatcher(Matcher):
 
     NAME = 'role'
@@ -214,7 +218,7 @@ class RoleMatcherV2(RoleMatcher):
             print_fn=bonus_info.append,
             verbose=True
         )
-        return best_teams, bonus_info[0]
+        return best_teams, '\n'.join(bonus_info)
 
     def dfs_greedy_search(self, t1, t2, current_score, strategy_fn, prefs,
                           searched=None, max_search=5000, moves=None):
@@ -256,21 +260,22 @@ class RoleMatcherV2(RoleMatcher):
         # adjust for team fairness based on peer rated strength
         t1_rating = sum(ratings_1)
         t2_rating = sum(ratings_2)
-        rating_fairness = sech2((t1_rating - t2_rating) / 3) ** 0.5 * 4
+        rating_fairness = sech2((t1_rating - t2_rating) / 3) ** 0.5 * 3
         # adjust for role fairness
         # system is penalised for making a difference in mirroring roles
         diff_softness = 2
-        diff_penalty = sum((log(a + diff_softness) -
-                            log(b + diff_softness)) ** 2 * 5 +
-                            0.04 * abs(c - d) ** 1.5
-                           for a, b, c, d in zip(happiness_1, happiness_2,
-                                                 ratings_1, ratings_2))
+        diffs = [((log(a + diff_softness) -
+                   log(b + diff_softness)) ** 2 * 5,
+                   0.04 * abs(c - d) ** 1.5)
+                 for a, b, c, d in zip(happiness_1, happiness_2,
+                                       ratings_1, ratings_2)]
+        diff_penalty = sum(sum(d) for d in diffs) * 0.3
+        biases = [d1 * sign(a - b) + d2 * sign(c - d)
+                  for a, b, c, d, (d1, d2) in zip(happiness_1, happiness_2,
+                                                  ratings_1, ratings_2,
+                                                  diffs)]
+        diff_penalty += abs(sum(biases) * 0.7)
         if print_fn is not None:
-            diffs = [(log(a + diff_softness) -
-                      log(b + diff_softness)) ** 2 * 5 +
-                      0.04 * abs(c - d) ** 1.5
-                     for a, b, c, d in zip(happiness_1, happiness_2,
-                                           ratings_1, ratings_2)]
             positives = t1_score + t2_score + fairness_bonus + rating_fairness
             print_fn(f'Evaluation metrics:\n=======\nBonuses\n=======\n'
                      f'Team 1 skill      {happiness_1} -> '
@@ -280,11 +285,18 @@ class RoleMatcherV2(RoleMatcher):
                      f'Team 1 ratings    {ratings_1} -> {sum(ratings_1)}\n'
                      f'Team 2 ratings    {ratings_2} -> {sum(ratings_2)}\n'
                      f'Fairness bonus      {round(fairness_bonus, 2)}  (/3)\n'
-                     f'Rating fairness   + {round(rating_fairness, 2)}  (/4)\n'
+                     f'Rating fairness   + {round(rating_fairness, 2)}  (/3)\n'
                      f'Calculation       = {round(positives, 2)}\n\n'
                      f'=========\nPenalties\n=========\n'
-                     f'Differences      {[round(d, 2) for d in diffs]}\n'
-                     f'Calculation      {round(diff_penalty, 2)}\n\n'
+                     f'Differences')
+            diffs_str = [str(round(abs(sum(v)), 2)) for v in diffs]
+            diffs_maxlen = max(len(s) for s in diffs_str)
+            for bias, diff in zip(biases, diffs_str):
+                print_fn(' ' * 18 +
+                         ('< ' if bias >= 0 else '  ') +
+                         diff + ' ' * (diffs_maxlen - len(diff)) +
+                         (' >' if bias <= 0 else '  '))
+            print_fn(f'Calculation       {round(diff_penalty, 2)}\n\n'
                      f'=====\nScore\n=====\n'
                      f'{round(positives - diff_penalty, 2)}\n')
         # + random.random() / 100
