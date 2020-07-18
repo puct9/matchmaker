@@ -268,7 +268,7 @@ class RoleMatcherV2(RoleMatcher):
         if print_fn is not None:
             diffs = [(log(a + diff_softness) -
                       log(b + diff_softness)) ** 2 * 5 +
-                      0.04 * (c - d) ** 2
+                      0.04 * (c - d) ** 1.5
                      for a, b, c, d in zip(happiness_1, happiness_2,
                                            ratings_1, ratings_2)]
             positives = t1_score + t2_score + fairness_bonus + rating_fairness
