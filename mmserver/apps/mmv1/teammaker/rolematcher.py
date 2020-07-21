@@ -320,9 +320,7 @@ class RoleMatcherV2(RoleMatcher):
                          ('< ' if bias >= 0 else '  ') +
                          diff + ' ' * (diffs_maxlen - len(diff)) +
                          (' >' if bias <= 0 else '  '))
-            print_fn(f'Carry potential 1 {carry_potential_1}\n'
-                     f'Carry potential 2 {carry_potential_2}\n'
-                     f'Calculation       {round(diff_penalty, 2)}\n\n'
+            print_fn(f'Calculation       {round(diff_penalty, 2)}\n\n'
                      f'=====\nScore\n=====\n'
                      f'{round(positives - diff_penalty, 2)}\n')
             print_fn(str(biases))
