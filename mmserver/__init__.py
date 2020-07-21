@@ -4,8 +4,8 @@ from base64 import b64decode
 
 from flask import Flask, Response, redirect, render_template, request, url_for
 
-from db import SimpleFsDB as LocalDB
-from teammaker import FriendMatcher, str2matcher
+from .db import SimpleFsDB as LocalDB
+from .teammaker import FriendMatcher, str2matcher
 
 DB = LocalDB()
 app = Flask(__name__)
