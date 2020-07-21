@@ -259,36 +259,55 @@ class RoleMatcherV2(RoleMatcher):
         fairness_bonus = sech2(t1_score - t2_score) * 3
         # adjust for team fairness based on peer rated strength
         # ratings need to be weighted
-        ratings_weights = [1, 0.8, 1, 0.8, 0.5]
-        ratings_1 = [round(a * b, 2) for a, b in zip(ratings_1, ratings_weights)]
-        ratings_2 = [round(a * b, 2) for a, b in zip(ratings_2, ratings_weights)]
+        ratings_weights = [1.0, 0.8, 1.0, 0.8, 0.5]
+        ratings_1 = [a * b for a, b in zip(ratings_1, ratings_weights)]
+        ratings_2 = [a * b for a, b in zip(ratings_2, ratings_weights)]
         t1_rating = sum(ratings_1)
         t2_rating = sum(ratings_2)
-        rating_fairness = sech2((t1_rating - t2_rating) / 3) ** 0.5 * 3
+        rating_fairness = sech2((t1_rating - t2_rating) / 2) ** 0.5 * 3
         # adjust for role fairness
         # system is penalised for making a difference in mirroring roles
+        carry_potential_1 = [max(0, exp(a / 4) - exp(b / 4))
+                             for a, b in zip(happiness_1, happiness_2)]
+        carry_potential_2 = [max(0, exp(b / 4) - exp(a / 4))
+                             for a, b in zip(happiness_1, happiness_2)]
+        # supports carry less
+        carry_potential_1[4] /= 2
+        carry_potential_2[4] /= 2
+        # support can boost adc a bit
+        carry_potential_1[3] += carry_potential_1[4]
+        carry_potential_2[3] += carry_potential_2[4]
+        # normalise
+        factor = 10 / sum(carry_potential_1 + carry_potential_2)
         diff_softness = 2
         diffs = [((log(a + diff_softness) -
                    log(b + diff_softness)) ** 2 * 5,
                    0.04 * abs(c - d) ** 1.5)
                  for a, b, c, d in zip(happiness_1, happiness_2,
                                        ratings_1, ratings_2)]
-        diff_penalty = sum(sum(d) for d in diffs) * 0.3
+        diff_penalty = sum(sum(d) for d in diffs) * 0.5
         biases = [d1 * sign(a - b) + d2 * sign(c - d)
                   for a, b, c, d, (d1, d2) in zip(happiness_1, happiness_2,
                                                   ratings_1, ratings_2,
                                                   diffs)]
-        diff_penalty += abs(sum(biases) * 0.7)
+        biases = [b * (carry_potential_1[i] if b >= 0
+                       else carry_potential_2[i]) * factor
+                  for i, b in enumerate(biases)]
+        diff_penalty += abs(sum(biases) * 0.5)
         if print_fn is not None:
             positives = t1_score + t2_score + fairness_bonus + rating_fairness
+            r_rate1 = [round(x, 2) for x in ratings_1]
+            r_rate1_sum = round(sum(ratings_1), 2)
+            r_rate2 = [round(x, 2) for x in ratings_2]
+            r_rate2_sum = round(sum(ratings_2), 2)
             print_fn(f'Evaluation metrics:\n=======\nBonuses\n=======\n'
                      f'Team 1 skill      {happiness_1} -> '
                      f'{round(t1_score, 2)}\n'
                      f'Team 2 skill      {happiness_2} -> '
                      f'{round(t2_score, 2)}\n'
                      f'Rating weights    {ratings_weights}\n'
-                     f'Team 1 ratings    {ratings_1} -> {sum(ratings_1)}\n'
-                     f'Team 2 ratings    {ratings_2} -> {sum(ratings_2)}\n'
+                     f'Team 1 ratings    {r_rate1} -> {r_rate1_sum}\n'
+                     f'Team 2 ratings    {r_rate2} -> {r_rate2_sum}\n'
                      f'Fairness bonus      {round(fairness_bonus, 2)}  (/3)\n'
                      f'Rating fairness   + {round(rating_fairness, 2)}  (/3)\n'
                      f'Calculation       = {round(positives, 2)}\n\n'
@@ -301,9 +320,12 @@ class RoleMatcherV2(RoleMatcher):
                          ('< ' if bias >= 0 else '  ') +
                          diff + ' ' * (diffs_maxlen - len(diff)) +
                          (' >' if bias <= 0 else '  '))
-            print_fn(f'Calculation       {round(diff_penalty, 2)}\n\n'
+            print_fn(f'Carry potential 1 {carry_potential_1}\n'
+                     f'Carry potential 2 {carry_potential_2}\n'
+                     f'Calculation       {round(diff_penalty, 2)}\n\n'
                      f'=====\nScore\n=====\n'
                      f'{round(positives - diff_penalty, 2)}\n')
+            print_fn(str(biases))
         # + random.random() / 100
         return (t1_score + t2_score + fairness_bonus + rating_fairness -
                 diff_penalty)
