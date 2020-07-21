@@ -323,7 +323,6 @@ class RoleMatcherV2(RoleMatcher):
             print_fn(f'Calculation       {round(diff_penalty, 2)}\n\n'
                      f'=====\nScore\n=====\n'
                      f'{round(positives - diff_penalty, 2)}\n')
-            print_fn(str(biases))
         # + random.random() / 100
         return (t1_score + t2_score + fairness_bonus + rating_fairness -
                 diff_penalty)
