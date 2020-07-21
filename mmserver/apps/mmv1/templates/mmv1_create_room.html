@@ -7,7 +7,7 @@
     <body>
         <div class="container" id="main_container">
             <br />
-            <a class="btn btn-large btn-danger" href="/">Back</a>
+            <a class="btn btn-large btn-danger" href="{{ url_for('mmv1.index') }}">Back</a>
             <h1>Specify player names:</h1>
             <div class="alert alert-danger" role="alert" id="error" hidden>Please make sure all fields are filled and there are no repeated names.</div>
             <form action="" method="POST" id="main_form">
@@ -18,6 +18,10 @@
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="mm_mode" id="mm_mode_2" value="role">
                     <label class="form-check-label" for="mm_mode_2">Match based on role preferences</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="mm_mode" id="mm_mode_3" value="rolev2">
+                    <label class="form-check-label" for="mm_mode_3">Match based on role preferences version 2</label>
                 </div>
                 <br />
             </form>

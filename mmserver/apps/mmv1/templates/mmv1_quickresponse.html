@@ -9,7 +9,7 @@
             <br />
             <h1>Just click on your name</h1>
             {% for response_id, player in info['response_ids'].items() %}
-            <a href="/respond/{{ response_id }}">{{ player }}</a> <br />
+            <a href="{{ url_for('mmv1.respond_page', response_id=response_id) }}">{{ player }}</a> <br />
             {% endfor %}
             <br />
         </div>

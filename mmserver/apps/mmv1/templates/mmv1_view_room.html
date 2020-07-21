@@ -9,9 +9,9 @@
             <br />
             <button class="btn btn-info" onclick="location.reload(); return false;">Refresh</button>
             <br /><br />
-            <p>Share the response IDs with the respective person. They can fill in their response by going to the <a href="/">home</a> page and
-            pressing <a href="/respond">Respond</a> before entering their response ID. Alternatively, you may opt to share this this
-            <a href="/room/{{ room_id }}/quickrespond">easy response page</a> or use the below button to copy all the names and response ids to
+            <p>Share the response IDs with the respective person. They can fill in their response by going to the <a href="{{ url_for('mmv1.index') }}">home</a> page and
+            pressing <a href="{{ url_for('mmv1.respond_prompt') }}">Respond</a> before entering their response ID. Alternatively, you may opt to share this this
+            <a href="{{ url_for('mmv1.room_quickresponse', room_id=room_id) }}">easy response page</a> or use the below button to copy all the names and response ids to
             your clipboard which you may then paste into Discord or something.</p>
             <p>Manually refresh the page periodically using the refresh button or by clicking <a href="">here</a>. Once all responses have been
             completed, the option to generate teams will be revealed.</p>
@@ -116,7 +116,7 @@
                         document.getElementById("nerdsection").hidden = false;
                     }
                 }
-                xhttp.open("GET", "/api/suggest/{{ room_id }}", true);
+                xhttp.open("GET", "{{ url_for('mmv1.api_room_suggest', room_id=room_id) }}", true);
                 xhttp.send();
             }
         </script>
