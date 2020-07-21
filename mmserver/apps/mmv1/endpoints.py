@@ -1,14 +1,22 @@
 import json
-import os
-from base64 import b64decode
 
-from flask import Flask, Response, redirect, render_template, request, url_for
+from flask import (Blueprint, Flask, Response, redirect,
+                   request, url_for)
+from flask import render_template as _render_template
 
-from db import SimpleFsDB as LocalDB
-from teammaker import FriendMatcher, str2matcher
+from .db import SimpleFsDB
+from .teammaker import FriendMatcher, str2matcher
 
-DB = LocalDB()
-app = Flask(__name__)
+DB = SimpleFsDB()
+app = Blueprint('mmv1', __name__, template_folder='templates')
+
+
+def render_template(*args, **kwargs):
+    # is this a hack or is it legit?
+    # no idea!
+    args = list(args)
+    args[0] = 'mmv1_' + args[0]
+    return _render_template(*args, **kwargs)
 
 
 @app.route('/')
@@ -103,11 +111,3 @@ def respond_submit(response_id):
     prefs = str2matcher(room_info['mode']).read_response(request.form)
     DB.set_response(response_id, prefs)
     return redirect(url_for('.respond_prompt', error='Done!'))
-
-
-if __name__ == '__main__':
-    try:
-        app.run('0.0.0.0', 80, True)
-    except PermissionError:
-        _PORT = int(os.environ.get('PORT', 17995))
-        app.run('0.0.0.0', _PORT, False)

@@ -1,19 +1,12 @@
-{% extends "respond_page_base.html" %}
+{% extends "mmv1_respond_page_base.html" %}
 {% block response_form %}
 <form action="" method="POST">
-    <p>
-    {% for _name in bonus %}
-    {{ _name }} <br />
-    {% endfor %}
-    </p>
     {% for _name, _prompt, _type in query %}
     <div class="form-group">
         <label for="{{ _name }}">{{ _prompt }}</label>
-        <input type="{{ _type }}" class="form-control" id="{{ _name }}" name="{{ _name }}" min="0" max="9">
+        <input type="{{ _type }}" class="form-control" id="{{ _name }}" name="{{ _name }}">
     </div>
     {% endfor %}
-    {% block respond_page_rm2_ext %}
-    {% endblock %}
     <button class="btn btn-success btn-block" type="submit">Submit</button>
 </form>
 {% endblock %}

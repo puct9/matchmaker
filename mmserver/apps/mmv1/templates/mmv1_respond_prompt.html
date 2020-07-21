@@ -30,7 +30,7 @@
                 let id = document.getElementById("response_id").value;
                 if (id === "")
                     return false;
-                location.href = "/respond/" + id;
+                location.href = "{{ url_for('mmv1.respond_page', response_id='') }}" + id;
             }
         </script>
     </body>
