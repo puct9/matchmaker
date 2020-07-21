@@ -258,6 +258,10 @@ class RoleMatcherV2(RoleMatcher):
                        for h in happiness_2) / 3
         fairness_bonus = sech2(t1_score - t2_score) * 3
         # adjust for team fairness based on peer rated strength
+        # ratings need to be weighted
+        ratings_weights = [1, 0.8, 1, 0.8, 0.5]
+        ratings_1 = [round(a * b, 2) for a, b in zip(ratings_1, ratings_weights)]
+        ratings_2 = [round(a * b, 2) for a, b in zip(ratings_2, ratings_weights)]
         t1_rating = sum(ratings_1)
         t2_rating = sum(ratings_2)
         rating_fairness = sech2((t1_rating - t2_rating) / 3) ** 0.5 * 3
@@ -282,6 +286,7 @@ class RoleMatcherV2(RoleMatcher):
                      f'{round(t1_score, 2)}\n'
                      f'Team 2 skill      {happiness_2} -> '
                      f'{round(t2_score, 2)}\n'
+                     f'Rating weights    {ratings_weights}\n'
                      f'Team 1 ratings    {ratings_1} -> {sum(ratings_1)}\n'
                      f'Team 2 ratings    {ratings_2} -> {sum(ratings_2)}\n'
                      f'Fairness bonus      {round(fairness_bonus, 2)}  (/3)\n'
