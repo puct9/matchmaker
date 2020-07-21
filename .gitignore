@@ -1,6 +1,5 @@
 /.git
 /.vscode
-/static
 /venv
 __pycache__
 *.json
