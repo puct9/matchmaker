@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <header>
+        <title>Draft v1</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">        
+    </header>
+    <body>
+        <div class="container">
+            <br />
+            <h1>Draft v1</h1>
+            <div class="row">
+                <div class="col-md-6">
+                    <a href="{{ url_for('draftv1.create_room') }}" class="btn btn-block btn-info">Create room</a>
+                </div>
+                <br /><br />
+                <div class="col-md-6">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Room code" id="roomcode">
+                        <div class="input-group-append">
+                            <button class="btn btn-success" type="button" onclick="GoRoom()">Join room</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            function GoRoom() {
+                location.href = "{{ url_for('draftv1.join_room', room_id='') }}" + document.getElementById("roomcode").value;
+            }
+        </script>
+    </body>
+</html>

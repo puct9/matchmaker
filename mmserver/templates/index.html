@@ -7,8 +7,15 @@
     <body>
         <div class="container">
             <br />
-            <h1>Site is restructuring!</h1>
-            <h2>Perhaps you are looking for <a href="{{ url_for('mmv1.index') }}">simple matchmaking v1</a></h2>
+            <h1>What are you looking for?</h1>
+            <div class="row">
+                <div class="col-md-6">
+                    <a href="{{ url_for('mmv1.index') }}" class="btn btn-block btn-info">Automated team generation and matchmaking</a>
+                </div>
+                <div class="col-md-6">
+                    <a href="{{ url_for('draftv1.index') }}" class="btn btn-block btn-info">The latest in team drafting technology</a>
+                </div>
+            </div>
         </div>
     </body>
 </html>
