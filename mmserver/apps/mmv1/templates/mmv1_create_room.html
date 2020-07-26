@@ -46,8 +46,8 @@
                 let names = [];
                 document.getElementById("error").hidden = true;
                 for (let i = 1; i < 11; i++) {
-                    let name = document.getElementById("player" + i).value;
-                    if (name == "" || names.includes(name) || name.includes(",")) {
+                    let name = document.getElementById("player" + i).value.trim();
+                    if (name == "" || names.includes(name)) {
                         document.getElementById("error").hidden = false;
                         return false;
                     }
