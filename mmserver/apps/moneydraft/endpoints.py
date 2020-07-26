@@ -256,7 +256,7 @@ def socket_draftinfo(data):
     try:
         payment = max(int(data.get('payment')), 0)
     except ValueError:
-        pass
+        return
     cli_stage = data.get('stage')
     accept = data.get('accept')
     if payment is None or cli_stage is None or accept is None:
