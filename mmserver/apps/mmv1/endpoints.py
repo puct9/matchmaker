@@ -31,7 +31,7 @@ def create_prompt():
 
 @app.route('/create', methods=['POST'])
 def create_go():
-    players = [request.form.get(f'p{i + 1}') for i in range(10)]
+    players = [request.form.get(f'p{i + 1}').strip() for i in range(10)]
     if not all(players) or len(set(players)) != 10:
         return redirect(url_for('.index'))
     room_id = DB.create_room(players, request.form.get('mm_mode'))
