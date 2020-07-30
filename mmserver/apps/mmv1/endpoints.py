@@ -6,7 +6,6 @@ from flask import render_template as _render_template
 
 from .db import SimpleFsDB
 from .teammaker import FriendMatcher, str2matcher
-from .. import LOGO_URL
 
 DB = SimpleFsDB()
 app = Blueprint('mmv1', __name__, template_folder='templates')
@@ -17,7 +16,6 @@ def render_template(*args, **kwargs):
     # no idea!
     args = list(args)
     args[0] = 'mmv1_' + args[0]
-    kwargs.update({'logo_url': LOGO_URL})
     return _render_template(*args, **kwargs)
 
 
