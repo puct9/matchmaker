@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template
 
-from .apps import create_app, socketio, LOGO_URL
+from .apps import create_app, socketio
 from .apps.mmv1 import app as mmv1_app
 from .apps.moneydraft import app as draftv1_app
 
