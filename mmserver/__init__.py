@@ -18,7 +18,7 @@ app.register_blueprint(draftv1_app, url_prefix='/draftv1')
 
 @app.route('/')
 def index():
-    return render_template('index.html', logo_url=LOGO_URL)
+    return render_template('index.html')
 
 
 if __name__ == '__main__':
