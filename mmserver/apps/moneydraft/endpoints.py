@@ -17,8 +17,6 @@ DB = LocalDB()
 
 
 def render_template(*args, **kwargs):
-    # is this a hack or is it legit?
-    # no idea!
     args = list(args)
     args[0] = 'draftv1_' + args[0]
     return _render_template(*args, **kwargs)
