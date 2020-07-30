@@ -6,6 +6,7 @@ from flask_socketio import SocketIO
 
 Payload.max_decode_packets = 512
 socketio = SocketIO()
+LOGO_URL = 'http://mmvm-cdn.storage.googleapis.com/meme.png'
 
 
 def create_app(debug=False):

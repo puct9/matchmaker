@@ -9,7 +9,7 @@ from flask import render_template as _render_template
 from flask_socketio import emit
 
 from .db import HotSwapDB as LocalDB
-from .. import socketio
+from .. import socketio, LOGO_URL
 
 app = Blueprint('draftv1', __name__, template_folder='templates',
                 static_folder='static')
@@ -17,10 +17,9 @@ DB = LocalDB()
 
 
 def render_template(*args, **kwargs):
-    # is this a hack or is it legit?
-    # no idea!
     args = list(args)
     args[0] = 'draftv1_' + args[0]
+    kwargs.update({'logo_url': LOGO_URL})
     return _render_template(*args, **kwargs)
 
 
