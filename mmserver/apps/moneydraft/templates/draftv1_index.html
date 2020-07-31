@@ -1,42 +1,40 @@
-<!DOCTYPE html>
-<html>
-    <header>
-        <title>Draft v1</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">        
-        <style>
-            .footerimg {
-                margin-top: 30px;
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
-                width: 50%;
-            }
-        </style>
-    </header>
-    <body>
-        <div class="container">
-            <br />
-            <h1>Draft mode</h1>
-            <div class="row">
-                <div class="col-md-6">
-                    <a href="{{ url_for('draftv1.create_room') }}" class="btn btn-block btn-info">Create room</a>
-                </div>
-                <br /><br />
-                <div class="col-md-6">
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Room code" id="roomcode">
-                        <div class="input-group-append">
-                            <button class="btn btn-success" type="button" onclick="GoRoom()">Join room</button>
-                        </div>
-                    </div>
-                </div>
+{% extends "base.html" %}
+{% block title %}
+Draft v1
+{% endblock %}
+{% block header_extra %}
+<style>
+    .footerimg {
+        margin-top: 30px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<h1>Draft mode</h1>
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <a href="{{ url_for('draftv1.create_room') }}" class="btn btn-block btn-info">Create room</a>
+    </div>
+    <br /><br />
+    <div class="col-md-6 mb-3">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Room code" id="roomcode">
+            <div class="input-group-append">
+                <button class="btn btn-success" type="button" onclick="GoRoom()">Join room</button>
             </div>
-            <img class="footerimg" class="center" src="{{ logo_url }}">
         </div>
-        <script>
-            function GoRoom() {
-                location.href = "{{ url_for('draftv1.join_room', room_id='') }}" + document.getElementById("roomcode").value;
-            }
-        </script>
-    </body>
-</html>
+    </div>
+</div>
+<img class="footerimg" class="center" src="{{ logo_url }}">
+{% endblock %}
+{% block footer %}
+<script>
+    function GoRoom() {
+        location.href = "{{ url_for('draftv1.join_room', room_id='') }}" + document.getElementById("roomcode").value;
+    }
+</script>
+{% endblock %}

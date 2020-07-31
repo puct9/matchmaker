@@ -1,20 +1,16 @@
-<!DOCTYPE html>
-<html>
-    <header>
-        <title>You're in strife</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">        
-    </header>
-    <body>
-        <div class="container">
-            <br />
-            <h1>Error!</h1>
-            <h2>{{ reason }}</h2>
-            <a href="{{ url_for('draftv1.index') }}" class="btn btn-success">Home</a>
-        </div>
-        <script>
-            function GoRoom() {
-                location.href = "{{ url_for('draftv1.join_room', room_id='') }}" + document.getElementById("roomcode").value;
-            }
-        </script>
-    </body>
-</html>
+{% extends "base.html" %}
+{% block title %}
+You're in strife
+{% endblock %}
+{% block content %}
+<h1>Error!</h1>
+<h2>{{ reason }}</h2>
+<a href="{{ url_for('draftv1.index') }}" class="btn btn-success">Home</a>
+{% endblock %}
+{% block footer %}
+<script>
+    function GoRoom() {
+        location.href = "{{ url_for('draftv1.join_room', room_id='') }}" + document.getElementById("roomcode").value;
+    }
+</script>
+{% endblock %}
