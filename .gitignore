@@ -1,6 +1,7 @@
 /.git
 /.vscode
 /venv
+/lvenv
 __pycache__
 *.json
 test*.py
