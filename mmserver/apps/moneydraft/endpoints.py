@@ -221,6 +221,7 @@ def socket_requestdraft(data):
     if room_info['stage']:
         return
     DB.advance_stage(room_id)
+    emit('draftupdate', {'stage': DB.get_room_info(room_id)['stage']})
 
 
 @socketio.on('draftinfo')
