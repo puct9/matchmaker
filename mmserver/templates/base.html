@@ -1,16 +1,16 @@
 {% extends "base_navless.html" %}
 {% block navbar %}
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for ('mmv1.index') }}">Matchmaking</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('draftv1.index') }}">Draft v1</a>
-                </li>
-            </ul></div>
-        </nav>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for ('mmv1.index') }}">Matchmaking</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('draftv1.index') }}">Draft v1</a>
+        </li>
+    </ul></div>
+</nav>
 {% endblock %}
