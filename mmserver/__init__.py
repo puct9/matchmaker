@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, redirect, render_template
 
-from .apps import create_app, socketio
+from .apps import FAVICON_URL, create_app, socketio
 from .apps.mmv1 import app as mmv1_app
 from .apps.moneydraft import app as draftv1_app
 
@@ -19,6 +19,11 @@ app.register_blueprint(draftv1_app, url_prefix='/draftv1')
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return redirect(FAVICON_URL)
 
 
 if __name__ == '__main__':
