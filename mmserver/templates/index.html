@@ -1,19 +1,9 @@
-{% extends "base.html" %}
+{% extends "base_plus_logo.html" %}
 {% block title %}
 Simple matchmaker
 {% endblock %}
-{% block header_extra %}
-<style>
-    .footerimg {
-        margin-top: 30px;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        width: 50%;
-    }
-</style>
-{% endblock %}
 {% block content %}
+
 <h1>What are you looking for?</h1>
 <div class="row">
     <div class="col-md-6 mb-3">
@@ -23,5 +13,4 @@ Simple matchmaker
         <a href="{{ url_for('draftv1.index') }}" class="btn btn-block btn-info">The latest in team drafting technology</a>
     </div>
 </div>
-<img class="footerimg" class="center" src="{{ logo_url }}" alt="meme image">
 {% endblock %}

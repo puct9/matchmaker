@@ -1,17 +1,6 @@
-{% extends "base.html" %}
+{% extends "base_plus_logo.html" %}
 {% block title %}
 Simple matchmaker
-{% endblock %}
-{% block header_extra %}
-<style>
-    .footerimg {
-        margin-top: 30px;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        width: 50%;
-    }
-</style>
 {% endblock %}
 {% block content %}
 <h1>Simple matchmaker</h1>
@@ -23,5 +12,4 @@ Simple matchmaker
         <a href="{{ url_for('mmv1.respond_prompt') }}" class="btn btn-block btn-primary">Respond</a>
     </div>
 </div>
-<img class="footerimg" class="center" src="{{ logo_url }}" alt="meme image">
 {% endblock %}

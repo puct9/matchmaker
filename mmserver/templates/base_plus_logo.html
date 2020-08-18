@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block header_extra %}
+<style>
+    .footerimg {
+        margin-top: 2em;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 90%;
+        margin-bottom: 1em;
+    }
+</style>
+{% endblock %}
+
+{% block content_footer %}
+<div class="row">
+    <div class="col-md-3 col-sm-1">
+    </div>
+    <div class="col-md-6 col-sm-10">
+        <img class="footerimg" class="center" src="{{ logo_url }}" alt="meme image">
+    </div>
+    <div class="col-md-3 col-sm-1">
+    </div>
+</div>
+{% endblock %}
