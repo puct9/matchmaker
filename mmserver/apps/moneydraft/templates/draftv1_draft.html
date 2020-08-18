@@ -1,0 +1,143 @@
+{% extends "base_navless.html" %}
+{% block title %}
+Drafting
+{% endblock %}
+{% block header_extra %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+{% endblock %}
+{% block content %}
+<form action="" method="POST" id="reloadform">
+    <input type="hidden" class="form-control" name="auth" value="{{ secret }}">
+    <button type="submit" class="btn btn-info">Refresh</button>
+</form>
+<form action="{{ url_for('draftv1.results_page', room_id=room_id) }}" method="POST" id="proceedform" hidden>
+    <input type="hidden" name="auth" value="{{ secret }}">
+</form>
+<h1>Drafting</h1>
+{% if captain_status %}
+<h2>You are the captain of team {{ captain_status }}</h2>
+<h3>Your coins: <span id="our_coins"></span></h3>
+<h3>Opponent coins: <span id="their_coins"></span></h3>
+{% endif %}
+<h3>Currently drafting: <span id="current_draft"></span></h3>
+{% if captain_status %}
+<br />
+<h4>Your bid: <span id="our_bid"></span></h4>
+<h4>Your intent: <span id="our_action"></span></h4>
+<input type="number" class="form-control" min="0" max="100" id="payment" placeholder="How much you would pay to...">
+<div class="form-check">
+    <input class="form-check-input" type="radio" name="bid_action" id="action_accept" value="accept" checked>
+    <label class="form-check-label" for="action_accept">Take this player for my team (Accept)</label>
+</div>
+<div class="form-check">
+    <input class="form-check-input" type="radio" name="bid_action" id="action_reject" value="reject">
+    <label class="form-check-label" for="action_reject">Send this player to the other team (Reject)</label>
+</div>
+<button type="button" class="btn btn-success" onclick="SubmitBid()">Submit</button>
+<br /><br /><br />
+{% endif %}
+<div id="teams">
+    <div class="row">
+        <div class="col-md-6">
+            <ul class="list-group">
+                <li class="list-group-item active">Team 1</li>
+                <li class="list-group-item" id="team1_0">-</li>
+                <li class="list-group-item" id="team1_1">-</li>
+                <li class="list-group-item" id="team1_2">-</li>
+                <li class="list-group-item" id="team1_3">-</li>
+                <li class="list-group-item" id="team1_4">-</li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <ul class="list-group">
+                <li class="list-group-item active">Team 2</li>
+                <li class="list-group-item" id="team2_0">-</li>
+                <li class="list-group-item" id="team2_1">-</li>
+                <li class="list-group-item" id="team2_2">-</li>
+                <li class="list-group-item" id="team2_3">-</li>
+                <li class="list-group-item" id="team2_4">-</li>
+            </ul>
+        </div>
+    </div>
+    <br />
+</div>
+{% endblock %}
+{% block footer %}
+<script>
+    var socket = io();
+    var secret = "{{ secret }}";
+    var room_id = "{{ room_id }}";
+    var currently_drafting = "";
+    var captain_coins = 0;
+    var curr_teams = [[], []];
+    var curr_stage = 0;
+    var curr_intent = [null, null];
+    var riuStarted = false;
+    socket.on('connect', function () {
+        console.log("Connected");
+        if (!riuStarted) {
+            RequestInformationUpdate(5000);
+            riuStarted = true;
+        }
+    });
+    socket.on('draftupdate', function (data) {
+        console.log(data);
+        if (data.drafting !== undefined && data.drafting !== currently_drafting) {
+            currently_drafting = data.drafting;
+            document.getElementById("current_draft").innerHTML = currently_drafting;
+        }
+        if (data.coins !== undefined && JSON.stringify(data.coins) !== JSON.stringify(captain_coins)) {
+            captain_coins = data.coins;
+            document.getElementById("our_coins").innerHTML = captain_coins[0];
+            document.getElementById("their_coins").innerHTML = captain_coins[1];
+        }
+        if (data.teams !== undefined && JSON.stringify(data.teams) !== JSON.stringify(curr_teams)) {
+            curr_teams = data.teams;
+            UpdateTeamsTable();
+        }
+        if (data.stage !== undefined && data.stage !== curr_stage) {
+            curr_stage = data.stage;
+            if (curr_stage >= 9)
+                document.getElementById("proceedform").submit();
+        }
+        if (data.intent !== undefined && JSON.stringify(data.intent) !== JSON.stringify(curr_intent)) {
+            curr_intent = data.intent;
+            if (curr_intent[0] === null) {
+                document.getElementById("our_bid").innerHTML = "-";
+            } else {
+                document.getElementById("our_bid").innerHTML = curr_intent[0];
+            }
+            if (curr_intent[1] === null) {
+                document.getElementById("our_action").innerHTML = "-";
+            } else if (curr_intent[1] === false) {
+                document.getElementById("our_action").innerHTML = "Reject";
+            } else {
+                document.getElementById("our_action").innerHTML = "Accept";
+            }
+        }
+    });
+    function UpdateTeamsTable() {
+        for (let i = 0; i < 5; i++) {
+            if (curr_teams[0][i] !== undefined)
+                document.getElementById("team1_" + i).innerHTML = curr_teams[0][i];
+            if (curr_teams[1][i] !== undefined)
+                document.getElementById("team2_" + i).innerHTML = curr_teams[1][i];
+        }
+    }
+    function SubmitBid() {
+        let payment = document.getElementById("payment").value;
+        let accept = document.getElementById("action_accept").checked;
+        socket.emit("draftbid", {"payment": payment, "stage": curr_stage, "secret": secret, "accept": accept});
+    }
+    async function RequestInformationUpdate(delay=5000) {
+        await sleep(100);
+        for (;;) {
+            socket.emit('draftinfo', {'secret': secret});
+            await sleep(delay);
+        }
+    }
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+</script>
+{% endblock %}

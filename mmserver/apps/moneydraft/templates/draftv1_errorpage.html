@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}
+You're in strife
+{% endblock %}
+{% block content %}
+<h1>Error!</h1>
+<h2>{{ reason }}</h2>
+<a href="{{ url_for('draftv1.index') }}" class="btn btn-success">Home</a>
+{% endblock %}
+{% block footer %}
+<script>
+    function GoRoom() {
+        location.href = "{{ url_for('draftv1.join_room', room_id='') }}" + document.getElementById("roomcode").value;
+    }
+</script>
+{% endblock %}

@@ -1,37 +1,33 @@
-<!DOCTYPE html>
-<html>
-    <header>
-        <title>Access response</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">        
-    </header>
-    <body>
-        <div class="container">
-            <br />
-            <a class="btn btn-large btn-danger" href="/">Back</a>
-            {% if error %}
-            <br /><br />
-                <div class="alert alert-danger" role="alert" id="error">{{ error }}</div>
-            {% endif %}
-            <h1>Access response</h1>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Response ID" id="response_id" />
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-success" onclick="Submit()">Go</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6"></div>
+{% extends "base.html" %}
+{% block title %}
+Access response
+{% endblock %}
+{% block content %}
+<a class="btn btn-large btn-danger" href="/">Back</a>
+{% if error %}
+<br /><br />
+    <div class="alert alert-danger" role="alert" id="error">{{ error }}</div>
+{% endif %}
+<h1>Access response</h1>
+<div class="row">
+    <div class="col-md-6">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Response ID" id="response_id" />
+            <div class="input-group-append">
+                <button class="btn btn-outline-success" onclick="Submit()">Go</button>
             </div>
         </div>
-        <script>
-            function Submit() {
-                let id = document.getElementById("response_id").value;
-                if (id === "")
-                    return false;
-                location.href = "{{ url_for('mmv1.respond_page', response_id='') }}" + id;
-            }
-        </script>
-    </body>
-</html>
+    </div>
+    <div class="col-md-6"></div>
+</div>
+{% endblock %}
+{% block footer %}
+<script>
+    function Submit() {
+        let id = document.getElementById("response_id").value;
+        if (id === "")
+            return false;
+        location.href = "{{ url_for('mmv1.respond_page', response_id='') }}" + id;
+    }
+</script>
+{% endblock %}

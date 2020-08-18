@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}
+Join room
+{% endblock %}
+{% block content %}
+{% if first %}
+<h1>Don't get too excited</h1>
+<h2>Enter your name first</h2>
+{% else %}
+<h2>Enter your name</h2>
+{% endif %}
+<form action="{{ url_for('draftv1.join_room_go', room_id=room_id) }}" method="POST">
+    <div class="form-group">
+        <input type="text" class="form-control" id="nameinput" placeholder="Name" name="name">
+        <br />
+        <button type="submit" class="btn btn-success">Go</button>
+    </div>
+</form>
+{% endblock %}

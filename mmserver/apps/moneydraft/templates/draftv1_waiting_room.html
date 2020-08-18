@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}
+Waiting for players
+{% endblock %}
+{% block header_extra %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+{% endblock %}
+{% block content %}
+<h3>Use only the below refresh button to refresh the page.</h3>
+<form action="" method="POST" id="reloadform">
+    <input type="hidden" class="form-control" name="auth" value="{{ secret }}">
+    <button type="submit" class="btn btn-info">Refresh</button>
+</form>
+<form action="{{ url_for('draftv1.drafting_page', room_id=room_id) }}" method="POST" id="nextstageform">
+    <input type="hidden" name="auth" value="{{ secret }}">
+</form>
+<h1>Hi, {{ name }}</h1>
+<h2>Room code: {{ room_id }}</h2>
+<button class="btn btn-success btn-lg" onclick="RequestDraft()" id="proceedbutton" hidden>Proceed to drafting</button>
+<br />
+<br />
+<h3>Participants</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col" id="action_head"></th>
+            <th scope="col">Name</th>
+            <th scope="col">Captain</th>
+        </tr>
+    </thead>
+    <tbody id="participantstb">
+    </tbody>
+</table>
+<br />
+{% endblock %}
+{% block footer %}
+<script type="text/javascript" charset="utf-8">
+    var socket = io();
+    var secret = "{{ secret }}";
+    var isOwner = false;
+    var participants = [];
+    var captains = [];
+    var colours = ["primary", "secondary", "success", "danger", "warning", "info"];
+    var colourCounter = 0;
+    var riuStarted = false;
+
+    socket.on('connect', function () {
+        console.log("Connected");
+        if (!riuStarted) {
+            riuStarted = true;
+            RequestInformationUpdate(5000);
+        }
+    });
+
+    socket.on('infoupdate', function(data) {
+        console.log(data);
+        if (data.stage !== undefined && data.stage !== 0) {
+            document.getElementById("nextstageform").submit();
+        }
+        if (data.kicked) {
+            document.getElementById("reloadform").submit();
+        }
+        if (data.owner !== undefined) {
+            isOwner = data.owner;
+        }
+        if ((data.players !== undefined && JSON.stringify(data.players) !== JSON.stringify(participants)) ||
+            (data.captains !== undefined && JSON.stringify(data.captains) !== JSON.stringify(captains))) {
+            if (data.players !== undefined)
+                participants = data.players;
+            if (data.captains !== undefined)
+                captains = data.captains;
+            UpdateTable();
+        }
+    })
+
+    async function RequestInformationUpdate(delay=5000) {
+        await sleep(100);
+        for (;;) {
+            socket.emit('getinfo', {'secret': secret});
+            await sleep(delay);
+        }
+    }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function UpdateTable() {
+        for (let i = 0; i < 10; i++) {
+            if (i < participants.length) {
+                if (isOwner) {
+                    document.getElementById("ctl_" + i).hidden = false;
+                } else {
+                    document.getElementById("ctl_" + i).hidden = true;
+                }
+                document.getElementById("tbname_" + i).innerHTML = participants[i];
+                if (captains[i] != 0) {
+                    document.getElementById("tbcapt_" + i).innerHTML = "Team " + captains[i];
+                } else {
+                    document.getElementById("tbcapt_" + i).innerHTML = "-";
+                }
+                document.getElementById("tbrow_" + i).setAttribute("class", "table-" + colours[colourCounter % colours.length]);
+                colourCounter++;
+            } else {
+                document.getElementById("tbrow_" + i).classList = [];
+                document.getElementById("tbcapt_" + i).innerHTML = "-";
+                document.getElementById("tbname_" + i).innerHTML = "Awaiting...";
+                document.getElementById("ctl_" + i).hidden = true;
+            }
+        }
+        let cptsum = 0;
+        for (let i = 0; i < captains.length; i++) {
+            cptsum += captains[i];
+        }
+        if (cptsum === 3 && captains.length === 10 && isOwner) {
+            document.getElementById("proceedbutton").hidden = false;
+        }
+    }
+
+    function RequestKickUser(user) {
+        let toKick = participants[user];
+        socket.emit("requestkick", {"secret": secret, "kick": toKick});
+    }
+
+    function RequestSetCaptain(user) {
+        let captain = participants[user];
+        socket.emit("requestcaptain", {"secret": secret, "captain": captain});
+    }
+
+    function RequestDraft() {
+        socket.emit("requestdraft", {"secret": secret});
+    }
+
+    window.onload = function() {
+        let ptb = document.getElementById("participantstb");
+        for (let i = 0; i < 10; i++) {
+            let tbrow = document.createElement("tr");
+            let controltd = document.createElement("td");
+            // button group
+            let controlgrp = document.createElement("div");
+            controlgrp.classList.add("btn-group");
+            controlgrp.setAttribute("role", "group");
+            controlgrp.setAttribute("id", "ctl_" + i);
+            controlgrp.hidden = true;
+            let kickbtn = document.createElement("button");
+            kickbtn.classList.add("btn", "btn-danger");
+            kickbtn.innerHTML = "Kick";
+            kickbtn.onclick = function () {
+                RequestKickUser(i);
+            }
+            controlgrp.appendChild(kickbtn);
+            let setcptbtn = document.createElement("button");
+            setcptbtn.classList.add("btn", "btn-info");
+            setcptbtn.innerHTML = "Make captain";
+            setcptbtn.onclick = function () {
+                RequestSetCaptain(i);
+            }
+            controlgrp.appendChild(setcptbtn);
+            controltd.appendChild(controlgrp);
+            tbrow.appendChild(controltd);
+            let nametd = document.createElement("td");
+            nametd.innerHTML = "Awaiting...";
+            nametd.setAttribute("id", "tbname_" + i);
+            tbrow.appendChild(nametd);
+            let captaintd = document.createElement("td");
+            captaintd.setAttribute("id", "tbcapt_" + i);
+            tbrow.appendChild(captaintd);
+            tbrow.setAttribute("id", "tbrow_" + i);
+            ptb.appendChild(tbrow);
+        }
+    }
+</script>
+{% endblock %}
