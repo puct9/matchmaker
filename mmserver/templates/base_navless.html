@@ -14,11 +14,14 @@
                 --theme-colour: {{ theme_colour }};
                 --theme-colour-secondary: {{ theme_colour_secondary }};
             }
+            .opt-bg-colour {
+                background:#f8f9fa;
+            }
         </style>
         {% block header_extra %}
         {% endblock %}
     </header>
-    <body>
+    <body class="opt-bg-colour">
         {% block navbar %}
         {% endblock %}
         {% block pre_content %}
