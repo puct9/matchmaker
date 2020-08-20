@@ -1,0 +1,28 @@
+{% extends "base_plus_logo.html" %}
+{% block title %}
+Draft v1
+{% endblock %}
+{% block content %}
+<h1>Draft mode</h1>
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <a href="{{ url_for('draftv1.create_room') }}" class="btn btn-block btn-info">Create room</a>
+    </div>
+    <br /><br />
+    <div class="col-md-6 mb-3">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Room code" id="roomcode">
+            <div class="input-group-append">
+                <button class="btn btn-success" type="button" onclick="GoRoom()">Join room</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block footer %}
+<script>
+    function GoRoom() {
+        location.href = "{{ url_for('draftv1.join_room', room_id='') }}" + document.getElementById("roomcode").value;
+    }
+</script>
+{% endblock %}
