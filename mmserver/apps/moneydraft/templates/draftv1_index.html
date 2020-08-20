@@ -2,27 +2,50 @@
 {% block title %}
 Draft v1
 {% endblock %}
+
 {% block content %}
-<h1>Draft mode</h1>
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <a href="{{ url_for('draftv1.create_room') }}" class="btn btn-block btn-info">Create room</a>
-    </div>
-    <br /><br />
-    <div class="col-md-6 mb-3">
-        <div class="input-group">
-            <input type="text" class="form-control" placeholder="Room code" id="roomcode">
-            <div class="input-group-append">
-                <button class="btn btn-success" type="button" onclick="GoRoom()">Join room</button>
+<div class="jumbotron text-center">
+    <h1 class="display-4">Drafting Mode</h1>
+    <p class="lead" style="margin-bottom: 2em;">Pay more for the better players</p>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <a href="{{ url_for('draftv1.create_room') }}" class="btn btn-block btn-info">Create room</a>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Room code" id="roomcode">
+                <div class="input-group-append">
+                    <button class="btn btn-success" type="button" onclick="GoRoom()">Join room</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
+<h1 class="font-weight-normal">How it works</h1>
+<p>
+    After gathering 10 people in a room, the room creator can set 2 captains and start the drafting process.
+    <br />
+    The drafting process consists of the two captains being allocated a sum of money which they use to make
+    bids for players. The player they are bidding for will be displayed, but not the bid amounts. Only the
+    winner of the bid pays. Captains can see each other's money.
+    <br />
+    The drafting process ends when any team has 5 members.
+</p>
 {% endblock %}
+
 {% block footer %}
 <script>
     function GoRoom() {
         location.href = "{{ url_for('draftv1.join_room', room_id='') }}" + document.getElementById("roomcode").value;
+    }
+
+    window.onload = function() {
+        document.getElementById("roomcode").addEventListener("keydown", ({key}) => {
+            if (key === "Enter") {
+                event.preventDefault();
+                GoRoom();
+            }
+        })
     }
 </script>
 {% endblock %}
