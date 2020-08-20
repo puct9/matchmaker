@@ -26,9 +26,14 @@ Simple matchmaker
 {% block pre_content %}
 <div class="jumbotron jtron-coloured"><div class="container">
     <div class="row">
-        <div class="col-md-6">
-            <h1 class="display-3">LRRMM</h1>
-            <p class="lead" style="margin-bottom: 2em;">The final solution for matchmaking.</p>
+        <div class="col-md-6"><div id="titlemaster" hidden>
+            <h1 class="display-3" id="titlename">
+                L<span style="font-size: 2.5rem;">eague</span>
+                R<span style="font-size: 2.5rem;">ound</span>
+                R<span style="font-size: 2.5rem;">obin</span>
+                M<span style="font-size: 2.5rem;">atch</span>M<span style="font-size: 2.5rem;">aker</span>
+            </h1>
+            <p class="lead" style="margin-bottom: 2em;" id="titledescr">The final solution for matchmaking.</p>
             <div class="row" style="margin-bottom: 2em;">
                 <div class="col-lg-6 mb-3">
                     <a href="{{ url_for('mmv1.index') }}" class="btn btn-block btn-info">Automated team generation and matchmaking</a>
@@ -37,7 +42,7 @@ Simple matchmaker
                     <a href="{{ url_for('draftv1.index') }}" class="btn btn-block btn-info">The latest in team drafting technology</a>
                 </div>
             </div>
-        </div>
+        </div></div>
         <div class="col-md-6">
             <img class="footerimg" class="center" src="{{ logo_url }}" alt="meme image">
         </div>
@@ -68,4 +73,25 @@ Simple matchmaker
         </p>
     </div>
 </div>
+{% endblock %}
+
+{% block footer %}
+<script>
+    window.onload = function() {
+        // easter eggs
+        document.getElementById("titlemaster").hidden = false;
+        if (Math.random() < 0.95)
+            return;
+        let rands = [
+            ["AHRI", "Definitely an acronym!"],
+            ["BEST MM SYSTEM", "Peak self-advertising."],
+            ["LRRMM", "Got any better names?"],
+            ["LoL sucks", "starcraft2.com"],
+            ["uwu", "I'm not weird!"]
+        ];
+        let choice = rands[Math.floor(Math.random() * rands.length)];
+        document.getElementById("titlename").innerHTML = choice[0];
+        document.getElementById("titledescr").innerHTML = choice[1];
+    }
+</script>
 {% endblock %}
