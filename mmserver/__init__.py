@@ -18,7 +18,7 @@ app.register_blueprint(draftv1_app, url_prefix='/draftv1')
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index2.html')
 
 
 @app.route('/favicon.ico')

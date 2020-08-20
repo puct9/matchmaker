@@ -1,16 +1,71 @@
-{% extends "base_plus_logo.html" %}
+{% extends "base.html" %}
 {% block title %}
 Simple matchmaker
 {% endblock %}
-{% block content %}
+{% block header_extra %}
+<style>
+    .footerimg {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 90%;
+    }
+    .jtron-coloured {
+        background: linear-gradient(var(--theme-colour), var(--theme-colour-secondary));
+    }
+    .navbar-custom {
+        background-color: var(--theme-colour)!important;
+    }
+    .lr-padded {
+        padding-left: 3%;
+        padding-right: 3%;
+    }
+</style>
+{% endblock %}
 
-<h1>What are you looking for?</h1>
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <a href="{{ url_for('mmv1.index') }}" class="btn btn-block btn-info">Automated team generation and matchmaking</a>
+{% block pre_content %}
+<div class="jumbotron jtron-coloured"><div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h1 class="display-3">LRRMM</h1>
+            <p class="lead" style="margin-bottom: 2em;">The final solution for matchmaking.</p>
+            <div class="row" style="margin-bottom: 2em;">
+                <div class="col-lg-6 mb-3">
+                    <a href="{{ url_for('mmv1.index') }}" class="btn btn-block btn-info">Automated team generation and matchmaking</a>
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <a href="{{ url_for('draftv1.index') }}" class="btn btn-block btn-info">The latest in team drafting technology</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <img class="footerimg" class="center" src="{{ logo_url }}" alt="meme image">
+        </div>
     </div>
-    <div class="col-md-6 mb-3">
-        <a href="{{ url_for('draftv1.index') }}" class="btn btn-block btn-info">The latest in team drafting technology</a>
+</div></div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 lr-padded">
+        <h1 class="font-weight-normal">Simple</h1>
+        <p>
+            The website was designed with ease of use in mind and made to be lightweight and to stay out of your way.
+        </p>
+    </div>
+    <div class="col-md-4 lr-padded">
+        <h1 class="font-weight-normal">Fun</h1>
+        <p>
+            Have fun whether you are exploring the different features of the site or just having a blast in-game.
+        </p>
+    </div>
+    <div class="col-md-4 lr-padded">
+        <h1 class="font-weight-normal">For You</h1>
+        <p>
+            This website was a project aimed at, constantly updated and tailored to <i>you</i>. Have any feature requests,
+            ideas or issues? This project is <a href="{{ source_link }}" target="_blank">open source</a> so you can let me know any time.
+            <a href="{{ url_for('about') }}">Learn more</a>.
+        </p>
     </div>
 </div>
 {% endblock %}

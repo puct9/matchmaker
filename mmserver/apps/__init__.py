@@ -11,7 +11,10 @@ FAVICON_URL = 'http://mmvm-cdn.storage.googleapis.com/favicon.ico'
 BONUS_DICT = {
     'logo_url': 'http://mmvm-cdn.storage.googleapis.com/meme.png',
     'navbar_icon_url': 'http://mmvm-cdn.storage.googleapis.com/lrr.png',
-    'favicon_url': FAVICON_URL
+    'favicon_url': FAVICON_URL,
+    'source_link': 'https://github.com/thejhonnyguy/matchmaker',
+    'theme_colour': '#BCD6FF',
+    'theme_colour_secondary': '#fff',
 }
 
 
