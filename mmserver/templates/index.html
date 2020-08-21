@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block head_extra %}
+<meta name="Description" content="LRRMM (League Round Robin MatchaMaker) is the final solution to all your LoL matchmaking woes.">
+{% endblock %}
 {% block title %}
 Advanced Matchmaking Systems
 {% endblock %}
@@ -68,8 +71,8 @@ Advanced Matchmaking Systems
         <h1 class="font-weight-normal">For You</h1>
         <p>
             This website was a project aimed at, constantly updated and tailored to <i>you</i>. Have any feature requests,
-            ideas or issues? This project is <a href="{{ source_link }}" target="_blank">open source</a> so you can let me know any time.
-            <a href="{{ url_for('about') }}">Learn more</a>.
+            ideas or issues? This project is <a href="{{ source_link }}" target="_blank" rel="noreferrer">open source</a> so you can let me know any time.
+            <a href="{{ url_for('about') }}">About this site</a>.
         </p>
     </div>
 </div>
@@ -84,6 +87,8 @@ Advanced Matchmaking Systems
             return;
         let rands = [
             ["AHRI", "Definitely an acronym!"],
+            ["XAYAH", "More <del>sparkles</del> feathers!"],
+            ["LUCIAN", "pew pew"],
             ["BEST MM SYSTEM", "Peak self-advertising."],
             ["LRRMM", "Got any better names?"],
             ["LoL sucks", "starcraft2.com"],
