@@ -27,13 +27,13 @@ Drafting
 <input type="number" class="form-control" min="0" max="100" id="payment" placeholder="How much you would pay to...">
 <div class="form-check">
     <input class="form-check-input" type="radio" name="bid_action" id="action_accept" value="accept" checked>
-    <label class="form-check-label" for="action_accept">Take this player for my team (Accept)</label>
+    <label class="form-check-label" for="action_accept">I want <span id="current_draft_av"></span> to be on my team (ACCEPT)</label>
 </div>
 <div class="form-check">
     <input class="form-check-input" type="radio" name="bid_action" id="action_reject" value="reject">
-    <label class="form-check-label" for="action_reject">Send this player to the other team (Reject)</label>
+    <label class="form-check-label" for="action_reject">I don't want <span id="current_draft_rv"></span> to be on my team (REJECT)</label>
 </div>
-<button type="button" class="btn btn-success" onclick="SubmitBid()">Submit</button>
+<button type="button" class="btn btn-success" onclick="SubmitBid()">Submit preference</button>
 <br /><br /><br />
 {% endif %}
 <div id="teams">
@@ -84,12 +84,14 @@ Drafting
         console.log(data);
         if (data.drafting !== undefined && data.drafting !== currently_drafting) {
             currently_drafting = data.drafting;
-            document.getElementById("current_draft").innerHTML = currently_drafting;
+            document.getElementById("current_draft").innerText = currently_drafting;
+            document.getElementById("current_draft_av").innerText = currently_drafting;
+            document.getElementById("current_draft_rv").innerText = currently_drafting;
         }
         if (data.coins !== undefined && JSON.stringify(data.coins) !== JSON.stringify(captain_coins)) {
             captain_coins = data.coins;
-            document.getElementById("our_coins").innerHTML = captain_coins[0];
-            document.getElementById("their_coins").innerHTML = captain_coins[1];
+            document.getElementById("our_coins").innerText = captain_coins[0];
+            document.getElementById("their_coins").innerText = captain_coins[1];
         }
         if (data.teams !== undefined && JSON.stringify(data.teams) !== JSON.stringify(curr_teams)) {
             curr_teams = data.teams;
@@ -103,25 +105,25 @@ Drafting
         if (data.intent !== undefined && JSON.stringify(data.intent) !== JSON.stringify(curr_intent)) {
             curr_intent = data.intent;
             if (curr_intent[0] === null) {
-                document.getElementById("our_bid").innerHTML = "-";
+                document.getElementById("our_bid").innerText = "-";
             } else {
-                document.getElementById("our_bid").innerHTML = curr_intent[0];
+                document.getElementById("our_bid").innerText = curr_intent[0];
             }
             if (curr_intent[1] === null) {
-                document.getElementById("our_action").innerHTML = "-";
+                document.getElementById("our_action").innerText = "-";
             } else if (curr_intent[1] === false) {
-                document.getElementById("our_action").innerHTML = "Reject";
+                document.getElementById("our_action").innerText = "REJECT";
             } else {
-                document.getElementById("our_action").innerHTML = "Accept";
+                document.getElementById("our_action").innerText = "ACCEPT";
             }
         }
     });
     function UpdateTeamsTable() {
         for (let i = 0; i < 5; i++) {
             if (curr_teams[0][i] !== undefined)
-                document.getElementById("team1_" + i).innerHTML = curr_teams[0][i];
+                document.getElementById("team1_" + i).innerText = curr_teams[0][i];
             if (curr_teams[1][i] !== undefined)
-                document.getElementById("team2_" + i).innerHTML = curr_teams[1][i];
+                document.getElementById("team2_" + i).innerText = curr_teams[1][i];
         }
     }
     function SubmitBid() {
