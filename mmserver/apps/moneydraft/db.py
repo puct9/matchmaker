@@ -14,6 +14,9 @@ class DraftDB:
     def __init__(self):
         pass
 
+    def all_rooms(self):
+        pass
+
     def reset(self):
         pass
 
@@ -62,6 +65,9 @@ class SimpleFsDB(DraftDB):
 
     def write_info(self):
         json.dump([self.rooms, self.secrets], open(self.fname, 'w'), indent=4)
+
+    def all_rooms(self):
+        return deepcopy(self.rooms)
 
     def reset(self):
         self.rooms = {}
@@ -232,6 +238,10 @@ class HotSwapDB(SimpleFsDB):
             self.rooms, self.secrets = json.load(open(self.fname))
         except (json.decoder.JSONDecodeError, FileNotFoundError):
             pass
+
+    def all_rooms(self):
+        self.load_info()
+        return super().all_rooms()
 
     def create_room(self):
         self.load_info()

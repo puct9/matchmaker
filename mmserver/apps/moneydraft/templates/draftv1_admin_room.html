@@ -1,0 +1,11 @@
+{% extends "base_navless.html" %}
+{% block title %}
+Room overview
+{% endblock %}
+
+{% block content %}
+<h1>Room {{ room_id }}</h1>
+{% for player in room_info['order'] %}
+<p>{{ player }}</p>
+{% endfor %}
+{% endblock %}

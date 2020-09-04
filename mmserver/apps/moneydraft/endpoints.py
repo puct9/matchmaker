@@ -1,15 +1,17 @@
 import json
+import os
 import random
 import time
 from functools import wraps
+from hashlib import sha512
 
-from flask import (Blueprint, Flask, Response, redirect,
-                   request, url_for)
+from flask import Blueprint, Flask, Response, redirect
 from flask import render_template as _render_template
+from flask import request, url_for
 from flask_socketio import emit
 
-from .db import HotSwapDB as LocalDB
 from .. import socketio
+from .db import HotSwapDB as LocalDB
 
 app = Blueprint('draftv1', __name__, template_folder='templates',
                 static_folder='static')
@@ -34,6 +36,23 @@ def assert_room_exists():
 
         return _assert_room_exists_decorated
     return _assert_room_exists
+
+
+def assert_valid_key():
+    def _assert_valid_key(fn):
+        @wraps(fn)
+        def _assert_valid_key_decorated(*args, **kwargs):
+            access = os.environ.get('draftv1_key')
+            if not access:
+                return redirect(url_for('.failure', reason='Key not set'))
+            key = kwargs.get('key')
+            # sufficiently long key means a salt is unnecessary
+            if key and sha512(key.encode()).hexdigest() == access:
+                return fn(*args, **kwargs)
+            return redirect(url_for('.failure', reason='Bad key'))
+
+        return _assert_valid_key_decorated
+    return _assert_valid_key
 
 
 def benchmark_endpoint():
@@ -149,6 +168,22 @@ def results_page(room_id):
 @app.route('/uhoh/<reason>')
 def failure(reason):
     return render_template('errorpage.html', reason=reason)
+
+
+@app.route('/admin/<key>')
+@assert_valid_key()
+def admin_page(key):
+    return render_template('admin_overview.html', rooms=DB.all_rooms(),
+                           key=key)
+
+
+@app.route('/admin/<key>/<room_id>')
+@assert_valid_key()
+@assert_room_exists()
+def admin_room(key, room_id):
+    return render_template('admin_room.html',
+                           room_info=DB.get_room_info(room_id), key=key,
+                           room_id=room_id)
 
 
 @socketio.on('getinfo')
