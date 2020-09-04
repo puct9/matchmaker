@@ -96,6 +96,8 @@ def join_room_go(room_id):
             # user has been kicked
             return redirect(url_for('.failure', reason='You have been kicked'))
         success, message = True, auth
+    # Rules on the name
+    name = name.strip()
     elif not name:
         success, message = False, 'Please enter a name'
     else:

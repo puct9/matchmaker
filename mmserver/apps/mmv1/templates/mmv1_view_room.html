@@ -93,7 +93,7 @@ completed, the option to generate teams will be revealed.</p>
         document.execCommand("copy");
         tmp.hidden = true;
     }
-    
+
     function RequestSuggestion() {
         let xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -103,12 +103,12 @@ completed, the option to generate teams will be revealed.</p>
                     return;
                 }
                 for (let i = 0; i < 5; i++) {
-                    document.getElementById("team1_" + (i + 1)).innerHTML = res.team1[i];
-                    document.getElementById("team2_" + (i + 1)).innerHTML = res.team2[i];
+                    document.getElementById("team1_" + (i + 1)).innerText = res.team1[i];
+                    document.getElementById("team2_" + (i + 1)).innerText = res.team2[i];
                 }
                 document.getElementById("teams").hidden = false;
                 // write nerd info as well
-                document.getElementById("nerdinfo").innerHTML = res.facts;
+                document.getElementById("nerdinfo").innerText = res.facts;
                 document.getElementById("nerdsection").hidden = false;
             }
         }
