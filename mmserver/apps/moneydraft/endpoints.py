@@ -88,7 +88,9 @@ def join_room(room_id):
 @app.route('/waiting/<room_id>', methods=['POST'])
 @assert_room_exists()
 def join_room_go(room_id):
-    name = request.form.get('name')
+    name = request.form.get('name', '')
+    # Rules on the name
+    name = name.strip()
     auth = request.form.get('auth')
     if auth:
         name = DB.secret_to_name(auth)

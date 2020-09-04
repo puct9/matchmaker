@@ -3,7 +3,7 @@
 Access response
 {% endblock %}
 {% block content %}
-<a class="btn btn-large btn-danger" href="/">Back</a>
+<a class="btn btn-large btn-danger" href="{{ url_for('mmv1.index') }}">Back</a>
 {% if error %}
 <br /><br />
     <div class="alert alert-danger" role="alert" id="error">{{ error }}</div>
@@ -28,6 +28,15 @@ Access response
         if (id === "")
             return false;
         location.href = "{{ url_for('mmv1.respond_page', response_id='') }}" + id;
+    }
+
+    window.onload = function () {
+        document.getElementById("response_id").addEventListener("keydown", ({key}) => {
+            if (key === "Enter") {
+                event.preventDefault();
+                Submit();
+            }
+        })
     }
 </script>
 {% endblock %}

@@ -1,4 +1,9 @@
 {% extends "base_plus_logo.html" %}
+{% block head_extra %}
+<meta name="Description" content="The LRRMM Automated Team Generation and Matchmaking platform
+                                  has its roots as a solution to creating fair and fun teams
+                                  for your you and your mates to play a game of LoL.">
+{% endblock %}
 {% block title %}
 About
 {% endblock %}
@@ -8,6 +13,7 @@ About
 <h2>Author</h2>
 <p>
     The Automated Team Generation and Matchmaking platform was written by Luke Yang and is open source.
+    The theme for the home page is blue because he only likes ARAM.
     <br />
     Artwork by David Kuang.
 </p>
@@ -32,7 +38,7 @@ About
     pointer to the source code when redistributed. Changes made must be disclosed, and the licence may not
     be removed or changed.
     <br />
-    You can find the code on <a href="https://github.com/thejhonnyguy/matchmaker" target="_blank">GitHub</a>.
+    You can find the code on <a href="{{ source_link }}" target="_blank" rel="noreferrer">GitHub</a>.
 </p>
 <h2 style="margin-bottom: -1em;"><i>GL HF GG</i></h2>
 {% endblock %}
