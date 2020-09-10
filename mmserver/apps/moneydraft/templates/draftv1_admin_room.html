@@ -1,0 +1,81 @@
+{% extends "base_navless.html" %}
+{% block title %}
+Room overview
+{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('draftv1.admin_page', key=key) }}" class="btn btn-success">Back</a>
+<h1>Room {{ room_id }}</h1>
+
+{% if 'draft_order' in room_info %}
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Draft order</th>
+            <th scope="col">Player</th>
+            <th scope="col">{{ room_info['captains'][0] }}'s choice</th>
+            <th scope="col">{{ room_info['captains'][1] }}'s choice</th>
+            <th scope="col">Average value</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for player in room_info['draft_order'] %}
+        <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ player }}</td>
+            <td>
+                {% if room_info['intents'][loop.index0][0][0] is not none %}
+                {{ '-' if not room_info['intents'][loop.index0][0][1] }}{{ room_info['intents'][loop.index0][0][0] }}
+                {% else %}
+                N/A
+                {% endif %}
+            </td>
+            <td>
+                {% if room_info['intents'][loop.index0][1][0] is not none %}
+                {{ '-' if not room_info['intents'][loop.index0][1][1] }}{{ room_info['intents'][loop.index0][1][0] }}
+                {% else %}
+                N/A
+                {% endif %}
+            </td>
+            <td>
+                {% if room_info['intents'][loop.index0][0][0] is not none and room_info['intents'][loop.index0][1][0] is not none %}
+                {{(
+                    room_info['intents'][loop.index0][0][0] * (room_info['intents'][loop.index0][0][1] * 2 - 1) +
+                    room_info['intents'][loop.index0][1][0] * (room_info['intents'][loop.index0][1][1] * 2 - 1)
+                ) / 2}}
+                {% else %}
+                N/A
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<br /><br />
+{% endif %}
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Join order</th>
+            <th scope="col">Player</th>
+            <th scope="col">Owner</th>
+            <th scope="col">Captain</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for player in room_info['order'] %}
+        <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ player }}</td>
+            <td>
+                {{ 'Owner' if room_info['guests'][player]['owner'] else '-' }}
+            </td>
+            <td>
+                {{ "Team %d" % (room_info['guests'][player]['captain'],) if room_info['guests'][player]['captain'] else '-' }}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
