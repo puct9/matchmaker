@@ -1,0 +1,12 @@
+{% extends "base_navless.html" %}
+{% block title %}
+Admin overview
+{% endblock %}
+
+{% block content %}
+<h1>Admin login</h1>
+<form action="{{ url_for('draftv1.admin_view') }}" method="POST">
+    <input type="text" class="form-control mb-3" name="key" placeholder="Access key">
+    <button type="submit" class="btn btn-success">Go</button>
+</form>
+{% endblock %}

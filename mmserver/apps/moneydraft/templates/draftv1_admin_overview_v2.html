@@ -1,0 +1,15 @@
+{% extends "base_navless.html" %}
+{% block title %}
+Admin overview
+{% endblock %}
+
+{% block content %}
+<h1>Overview</h1>
+{% for room_id in rooms %}
+<form action="{{ url_for('draftv1.admin_view') }}" method="{{ link_method }}">
+    <input type="hidden" name="key" value="{{ key }}">
+    <input type="hidden" name="resource" value="{{ room_id }}">
+    <button type="submit" class="btn btn-link">{{ room_id }}</button>
+</form>
+{% endfor %}
+{% endblock %}
