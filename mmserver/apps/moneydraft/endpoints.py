@@ -45,7 +45,9 @@ def assert_valid_key():
             access = os.environ.get('draftv1_key')
             if not access:
                 return redirect(url_for('.failure', reason='Key not set'))
-            key = kwargs.get('key')
+            key = (kwargs.get('key') or
+                   request.args.get('key') or
+                   request.form.get('key'))
             # sufficiently long key means a salt is unnecessary
             if key and sha512(key.encode()).hexdigest() == access:
                 return fn(*args, **kwargs)
@@ -172,11 +174,34 @@ def failure(reason):
     return render_template('errorpage.html', reason=reason)
 
 
+@app.route('/admin', methods=['GET'])
+def admin_login():
+    return render_template('admin_login_v2.html')
+
+
+@app.route('/admin/view', methods=['GET', 'POST'])
+@assert_valid_key()
+def admin_view():
+    key = request.args.get('key') or request.form.get('key')
+    resource = (request.args.get('resource') or
+                request.form.get('resource') or
+                'overview')
+    if resource == 'overview':
+        return render_template('admin_overview_v2.html', rooms=DB.all_rooms(),
+                               key=key, link_method=request.method)
+    room_info = DB.get_room_info(resource)
+    if room_info is not None:
+        return render_template('admin_room_v2.html',
+                               room_info=room_info, key=key, room_id=resource,
+                               link_method=request.method)
+    return redirect(url_for('draftv1.admin_login'))
+
+
 @app.route('/admin/<key>')
 @assert_valid_key()
 def admin_page(key):
     return render_template('admin_overview.html', rooms=DB.all_rooms(),
-                           key=key)
+                           key=key, link_method=request.method)
 
 
 @app.route('/admin/<key>/<room_id>')
