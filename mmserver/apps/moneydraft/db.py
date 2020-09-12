@@ -23,6 +23,9 @@ class DraftDB:
     def create_room(self):
         pass
 
+    def delete_room(self, room_id):
+        pass
+
     def get_room_info(self):
         pass
 
@@ -88,6 +91,16 @@ class SimpleFsDB(DraftDB):
         }
         self.write_info()
         return room_id
+
+    def delete_room(self, room_id):
+        deleted = self.rooms.pop(room_id, None)
+        if deleted is None:
+            self.write_info()
+            return False
+        for _, guest_info in deleted['guests'].items():
+            self.secrets.pop(guest_info['secret'], None)
+        self.write_info()
+        return True
 
     def get_room_info(self, room_id):
         return deepcopy(self.rooms.get(room_id))
@@ -246,6 +259,10 @@ class HotSwapDB(SimpleFsDB):
     def create_room(self):
         self.load_info()
         return super().create_room()
+
+    def delete_room(self, room_id):
+        self.load_info()
+        return super().delete_room(room_id)
 
     def get_room_info(self, room_id):
         self.load_info()
