@@ -7,7 +7,12 @@ Admin overview
 <form action="{{ url_for('draftv1.admin_view') }}" method="{{ link_method }}">
     <input type="hidden" name="key" value="{{ key }}">
     <input type="hidden" name="resource" value="overview">
-    <button type="submit" class="btn btn-success">Refresh</button>
+    <button type="submit" class="btn btn-success mb-3">Refresh</button>
+</form>
+<form action="{{ url_for('draftv1.admin_view') }}" method="{{ 'GET' if link_method == 'POST' else 'POST' }}">
+    <input type="hidden" name="key" value="{{ key }}">
+    <input type="hidden" name="resource" value="overview">
+    <button type="submit" class="btn btn-success mb-3">Switch request methods</button>
 </form>
 
 <h1>Overview</h1>
@@ -28,7 +33,7 @@ Admin overview
                 <input type="hidden" name="resource" value="{{ room_id }}">
             </form>
             <td style="vertical-align: middle;">
-                <button type="button" class="btn btn-danger" onclick="RequestDeleteRoom('{{ room_id }}')">X</button>
+                <button type="button" class="btn btn-danger" onclick="RequestDeleteRoom('{{ room_id }}')">Delete</button>
             </td>
             <td style="vertical-align: middle;">
                 <a href="javascript:;" onclick="OpenRoom('{{ room_id }}', false)" onauxclick="OpenRoom('{{ room_id }}', true)">{{ room_id }}</a>
