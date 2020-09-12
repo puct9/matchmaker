@@ -12,7 +12,7 @@ Room overview
 <h1>Room {{ room_id }}</h1>
 
 {% if 'draft_order' in room_info %}
-<table class="table">
+<table class="table mb-5">
     <thead>
         <tr>
             <th scope="col">Draft order</th>
@@ -55,8 +55,7 @@ Room overview
         {% endfor %}
     </tbody>
 </table>
-<br /><br />
-<div class="row">
+<div class="row mb-5">
     <div class="col-md-6">
         <ul class="list-group">
             <li class="list-group-item active">Team 1</li>
@@ -74,9 +73,8 @@ Room overview
         </ul>
     </div>
 </div>
-<br /><br />
 {% endif %}
-<table class="table">
+<table class="table mb-3">
     <thead>
         <tr>
             <th scope="col">Join order</th>
