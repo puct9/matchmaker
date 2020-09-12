@@ -208,22 +208,6 @@ def admin_delete():
     return Response(json.dumps({'success': success}), mimetype='text/plain')
 
 
-@app.route('/admin/v1/<key>')
-@assert_valid_key()
-def admin_page(key):
-    return render_template('admin_overview.html', rooms=DB.all_rooms(),
-                           key=key, link_method=request.method)
-
-
-@app.route('/admin/v1/<key>/<room_id>')
-@assert_valid_key()
-@assert_room_exists()
-def admin_room(key, room_id):
-    return render_template('admin_room.html',
-                           room_info=DB.get_room_info(room_id), key=key,
-                           room_id=room_id)
-
-
 @socketio.on('getinfo')
 def socket_getinfo(data):
     if not isinstance(data, dict):
