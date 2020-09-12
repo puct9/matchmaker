@@ -197,14 +197,25 @@ def admin_view():
     return redirect(url_for('draftv1.admin_login'))
 
 
-@app.route('/admin/<key>')
+@app.route('/admin/delete', methods=['POST'])
+@assert_valid_key()
+def admin_delete():
+    key = request.args.get('key') or request.form.get('key')
+    resource = (request.args.get('resource') or
+                request.form.get('resource') or
+                'overview')
+    success = DB.delete_room(resource)
+    return Response(json.dumps({'success': success}), mimetype='text/plain')
+
+
+@app.route('/admin/v1/<key>')
 @assert_valid_key()
 def admin_page(key):
     return render_template('admin_overview.html', rooms=DB.all_rooms(),
                            key=key, link_method=request.method)
 
 
-@app.route('/admin/<key>/<room_id>')
+@app.route('/admin/v1/<key>/<room_id>')
 @assert_valid_key()
 @assert_room_exists()
 def admin_room(key, room_id):

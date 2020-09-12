@@ -4,12 +4,77 @@ Admin overview
 {% endblock %}
 
 {% block content %}
-<h1>Overview</h1>
-{% for room_id in rooms %}
 <form action="{{ url_for('draftv1.admin_view') }}" method="{{ link_method }}">
     <input type="hidden" name="key" value="{{ key }}">
-    <input type="hidden" name="resource" value="{{ room_id }}">
-    <button type="submit" class="btn btn-link">{{ room_id }}</button>
+    <input type="hidden" name="resource" value="overview">
+    <button type="submit" class="btn btn-success mb-3">Refresh</button>
 </form>
-{% endfor %}
+<form action="{{ url_for('draftv1.admin_view') }}" method="{{ 'GET' if link_method == 'POST' else 'POST' }}">
+    <input type="hidden" name="key" value="{{ key }}">
+    <input type="hidden" name="resource" value="overview">
+    <button type="submit" class="btn btn-success mb-3">Switch request methods</button>
+</form>
+
+<h1>Overview</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Control</th>
+            <th scope="col">Room</th>
+            <th scope="col">Stage</th>
+            <th scope="col" style="border-left: 1px solid #dee2e6;">Players</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for room_id, room_info in rooms.items() %}
+        <tr id="tr-{{ room_id }}">
+            <form action="{{ url_for('draftv1.admin_view') }}" method="{{ link_method }}" id="gorcs-{{ room_id }}">
+                <input type="hidden" name="key" value="{{ key }}">
+                <input type="hidden" name="resource" value="{{ room_id }}">
+            </form>
+            <td style="vertical-align: middle;">
+                <button type="button" class="btn btn-danger" onclick="RequestDeleteRoom('{{ room_id }}')">Delete</button>
+            </td>
+            <td style="vertical-align: middle;">
+                <a href="javascript:;" onclick="OpenRoom('{{ room_id }}', false)" onauxclick="OpenRoom('{{ room_id }}', true)">{{ room_id }}</a>
+            </td>
+            <td style="text-align: center; vertical-align: middle;">
+                {{ room_info['stage'] }}
+            </td>
+            <td style="border-left: 1px solid #dee2e6; vertical-align: middle;">
+                {{ ', '.join(room_info['order']) }}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block footer %}
+<script>
+    function OpenRoom(code, new_tab) {
+        let room_form = document.getElementById("gorcs-" + code);
+        if (new_tab) {
+            room_form.setAttribute("target", "_blank");
+        } else {
+            room_form.setAttribute("target", "");
+        }
+        room_form.submit();
+    }
+
+    function RequestDeleteRoom(code) {
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                let success = JSON.parse(this.responseText)["success"];
+                if (success) {
+                    document.getElementById("tr-" + code).hidden = true;
+                }
+            }
+        }
+        xhttp.open("POST", "{{ url_for('draftv1.admin_delete') }}", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.send("key={{ key }}&resource=" + code);
+    }
+</script>
 {% endblock %}
