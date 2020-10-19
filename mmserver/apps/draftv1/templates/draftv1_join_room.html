@@ -11,6 +11,9 @@ Join room
 {% endif %}
 <form action="{{ url_for('draftv1.join_room_go', room_id=room_id) }}" method="POST" autocomplete="off">
     <div class="form-group mb-3">
+        <!--Chrome has some fucking issues so have to this shit-->
+        <input type="hidden" name="dummy1" disabled>
+        <input type="hidden" name="dummy2" disabled>
         <input type="text" class="form-control" id="nameinput" placeholder="Name" name="name">
     </div>
     <button type="submit" class="btn btn-success">Go</button>
