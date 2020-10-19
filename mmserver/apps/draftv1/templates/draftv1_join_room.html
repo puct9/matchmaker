@@ -9,11 +9,10 @@ Join room
 {% else %}
 <h2>Enter your name</h2>
 {% endif %}
-<form action="{{ url_for('draftv1.join_room_go', room_id=room_id) }}" method="POST">
-    <div class="form-group">
+<form action="{{ url_for('draftv1.join_room_go', room_id=room_id) }}" method="POST" autocomplete="off">
+    <div class="form-group mb-3">
         <input type="text" class="form-control" id="nameinput" placeholder="Name" name="name">
-        <br />
-        <button type="submit" class="btn btn-success">Go</button>
     </div>
+    <button type="submit" class="btn btn-success">Go</button>
 </form>
 {% endblock %}
