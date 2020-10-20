@@ -99,6 +99,12 @@ def create_room():
                            room_id=room_id)
 
 
+@app.route('/join/')
+def join_room_noid():
+    return redirect(url_for('.failure',
+                            reason='Room does not exist'))
+
+
 @app.route('/join/<room_id>')
 @assert_room_exists()
 def join_room(room_id):
