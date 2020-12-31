@@ -14,10 +14,16 @@ class DraftDB:
     def __init__(self):
         pass
 
+    def all_rooms(self):
+        pass
+
     def reset(self):
         pass
 
     def create_room(self):
+        pass
+
+    def delete_room(self, room_id):
         pass
 
     def get_room_info(self):
@@ -63,6 +69,9 @@ class SimpleFsDB(DraftDB):
     def write_info(self):
         json.dump([self.rooms, self.secrets], open(self.fname, 'w'), indent=4)
 
+    def all_rooms(self):
+        return deepcopy(self.rooms)
+
     def reset(self):
         self.rooms = {}
         self.write_info()
@@ -82,6 +91,16 @@ class SimpleFsDB(DraftDB):
         }
         self.write_info()
         return room_id
+
+    def delete_room(self, room_id):
+        deleted = self.rooms.pop(room_id, None)
+        if deleted is None:
+            self.write_info()
+            return False
+        for _, guest_info in deleted['guests'].items():
+            self.secrets.pop(guest_info['secret'], None)
+        self.write_info()
+        return True
 
     def get_room_info(self, room_id):
         return deepcopy(self.rooms.get(room_id))
@@ -233,9 +252,17 @@ class HotSwapDB(SimpleFsDB):
         except (json.decoder.JSONDecodeError, FileNotFoundError):
             pass
 
+    def all_rooms(self):
+        self.load_info()
+        return super().all_rooms()
+
     def create_room(self):
         self.load_info()
         return super().create_room()
+
+    def delete_room(self, room_id):
+        self.load_info()
+        return super().delete_room(room_id)
 
     def get_room_info(self, room_id):
         self.load_info()

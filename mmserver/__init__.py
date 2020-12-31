@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template
 
 from .apps import FAVICON_URL, create_app, socketio
 from .apps.mmv1 import app as mmv1_app
-from .apps.moneydraft import app as draftv1_app
+from .apps.draftv1 import app as draftv1_app
 
 app = create_app(debug=True)
 app.template_folder = '../templates'

@@ -1,15 +1,17 @@
 import json
+import os
 import random
 import time
 from functools import wraps
+from hashlib import sha512
 
-from flask import (Blueprint, Flask, Response, redirect,
-                   request, url_for)
+from flask import Blueprint, Flask, Response, redirect
 from flask import render_template as _render_template
+from flask import request, url_for
 from flask_socketio import emit
 
-from .db import HotSwapDB as LocalDB
 from .. import socketio
+from .db import HotSwapDB as LocalDB
 
 app = Blueprint('draftv1', __name__, template_folder='templates',
                 static_folder='static')
@@ -34,6 +36,25 @@ def assert_room_exists():
 
         return _assert_room_exists_decorated
     return _assert_room_exists
+
+
+def assert_valid_key():
+    def _assert_valid_key(fn):
+        @wraps(fn)
+        def _assert_valid_key_decorated(*args, **kwargs):
+            access = os.environ.get('draftv1_key')
+            if not access:
+                return redirect(url_for('.failure', reason='Key not set'))
+            key = (kwargs.get('key') or
+                   request.args.get('key') or
+                   request.form.get('key'))
+            # sufficiently long key means a salt is unnecessary
+            if key and sha512(key.encode()).hexdigest() == access:
+                return fn(*args, **kwargs)
+            return redirect(url_for('.failure', reason='Bad key'))
+
+        return _assert_valid_key_decorated
+    return _assert_valid_key
 
 
 def benchmark_endpoint():
@@ -76,6 +97,12 @@ def create_room():
     room_id = DB.create_room()
     return render_template('join_room.html', first=True,
                            room_id=room_id)
+
+
+@app.route('/join/')
+def join_room_noid():
+    return redirect(url_for('.failure',
+                            reason='Room does not exist'))
 
 
 @app.route('/join/<room_id>')
@@ -151,6 +178,40 @@ def results_page(room_id):
 @app.route('/uhoh/<reason>')
 def failure(reason):
     return render_template('errorpage.html', reason=reason)
+
+
+@app.route('/admin', methods=['GET'])
+def admin_login():
+    return render_template('admin_login_v2.html')
+
+
+@app.route('/admin/view', methods=['GET', 'POST'])
+@assert_valid_key()
+def admin_view():
+    key = request.args.get('key') or request.form.get('key')
+    resource = (request.args.get('resource') or
+                request.form.get('resource') or
+                'overview')
+    if resource == 'overview':
+        return render_template('admin_overview_v2.html', rooms=DB.all_rooms(),
+                               key=key, link_method=request.method)
+    room_info = DB.get_room_info(resource)
+    if room_info is not None:
+        return render_template('admin_room_v2.html',
+                               room_info=room_info, key=key, room_id=resource,
+                               link_method=request.method)
+    return redirect(url_for('draftv1.admin_login'))
+
+
+@app.route('/admin/delete', methods=['POST'])
+@assert_valid_key()
+def admin_delete():
+    key = request.args.get('key') or request.form.get('key')
+    resource = (request.args.get('resource') or
+                request.form.get('resource') or
+                'overview')
+    success = DB.delete_room(resource)
+    return Response(json.dumps({'success': success}), mimetype='text/plain')
 
 
 @socketio.on('getinfo')
